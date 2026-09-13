@@ -66,7 +66,11 @@ so call it out), and run `cargo test` (the counts in `snapshot.json` are asserte
 
 ## Releases
 
-Releases are cut by tagging `vX.Y.Z` on `main`; [cargo-dist](https://opensource.axo.dev/cargo-dist/)
+Releases are cut by tagging `vX.Y.Z` on `main`. **Always tag the current head of `main`**: GitHub
+refuses to let the workflow token create a release whose target commit is behind a later change to
+any `.github/workflows/*.yml` file (it demands a `workflows` scope the built-in token cannot have), so
+a tag that trails a workflow edit fails in the `host` job with `HTTP 403: Resource not accessible by
+integration`. If that happens, delete the tag and re-tag the head. [cargo-dist](https://opensource.axo.dev/cargo-dist/)
 builds the binaries, installer, Homebrew formula and GitHub Release. Run `dist plan` locally after
 changing `dist-workspace.toml`, and keep `.github/workflows/release.yml` generated (`dist generate`),
 never hand-edited.
