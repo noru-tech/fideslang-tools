@@ -1,0 +1,21 @@
+# Rust
+/target/
+*.pending-snap
+
+# Python (taxonomy refresh helper only)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# Local scratch
+*.local

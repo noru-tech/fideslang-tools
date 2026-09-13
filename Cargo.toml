@@ -1,0 +1,67 @@
+[package]
+name = "fideslang-cli"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89"
+description = "fl — a command-line toolbox for Fideslang privacy taxonomies and Fides manifests: browse, visualize, convert, merge, validate"
+license = "MIT"
+repository = "https://github.com/noru-tech/fideslang-tools"
+homepage = "https://github.com/noru-tech/fideslang-tools"
+documentation = "https://github.com/noru-tech/fideslang-tools#readme"
+readme = "README.md"
+keywords = ["fideslang", "fides", "privacy", "taxonomy", "cli"]
+categories = ["command-line-utilities", "data-structures"]
+authors = ["Noru <bip@noru.tech>"]
+include = [
+  "src/**",
+  "taxonomy/**",
+  "Cargo.toml",
+  "LICENSE",
+  "NOTICE",
+  "README.md",
+  "CHANGELOG.md",
+]
+
+[lib]
+name = "fideslang_cli"
+path = "src/lib.rs"
+
+[[bin]]
+name = "fl"
+path = "src/main.rs"
+
+[dependencies]
+anstream = "1.0"
+anstyle = "1.0"
+anyhow = "1.0"
+clap = { version = "4.6", features = ["derive", "env", "wrap_help"] }
+clap_complete = "4.6"
+clap_mangen = "0.3"
+csv = "1.4"
+globset = "0.4"
+indexmap = { version = "2", features = ["serde"] }
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+serde-saphyr = "1.2"
+strsim = "0.11"
+thiserror = "2"
+unicode-width = "0.2"
+walkdir = "2"
+
+[dev-dependencies]
+assert_cmd = "2.2"
+insta = { version = "1.48", features = ["yaml"] }
+predicates = "3.1"
+tempfile = "3"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+
+# cargo-binstall: dist produces `<name>-<target>.tar.xz` archives on GitHub Releases.
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/{ name }-{ target }{ archive-suffix }"
+bin-dir = "{ name }-{ target }/{ bin }{ binary-ext }"
+pkg-fmt = "txz"

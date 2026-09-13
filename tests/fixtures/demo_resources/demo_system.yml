@@ -1,0 +1,32 @@
+system:
+  - fides_key: demo_analytics_system
+    name: Demo Analytics System
+    description: A system used for analyzing customer behaviour.
+    system_type: Service
+    administrating_department: Engineering
+    ingress:
+      - fides_key: demo_users_dataset
+        type: dataset
+    privacy_declarations:
+      - name: Analyze customer behaviour for improvements.
+        data_categories:
+          - user.contact
+          - user.device.cookie_id
+        data_use: improve.system
+        data_subjects:
+          - customer
+        ingress:
+          - demo_users_dataset
+
+  - fides_key: demo_marketing_system
+    name: Demo Marketing System
+    description: Collect data about our users for marketing.
+    system_type: Service
+    privacy_declarations:
+      - name: Collect data for marketing
+        data_categories:
+          #- user.contact # uncomment to add this category to the system
+          - user.cookie_id
+        data_use: advertising
+        data_subjects:
+          - customer

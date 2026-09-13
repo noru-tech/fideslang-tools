@@ -1,0 +1,13 @@
+{
+  "snapshot": "iab",
+  "upstream": "https://github.com/IABTechLab/fideslang",
+  "tag": "3.0.0",
+  "commit": "c53726c9d9eeebb6b43bf56d53c29b53fc07249e",
+  "snapshot_date": "2026-09-13",
+  "license": "CC-BY-4.0",
+  "counts": {
+    "data_category": 85,
+    "data_use": 55,
+    "data_subject": 15
+  }
+}

@@ -1,0 +1,35 @@
+dataset:
+- fides_key: demo_users_dataset
+  organization_fides_key: default_organization
+  name: Demo Users Dataset
+  description: Data collected about users for our analytics system.
+  meta: null
+  data_categories: []
+  collections:
+  - name: users
+    description: User information
+    data_categories: []
+    fields:
+    - name: created_at
+      description: User's creation timestamp
+      data_categories:
+      - system.operations
+    - name: email
+      description: User's Email
+      data_categories:
+      - user.contact.email
+    - name: first_name
+      description: User's first name
+      data_categories:
+      - user.name
+    - name: food_preference
+      description: User's favorite food
+      data_categories: []
+    - name: state
+      description: User's State
+      data_categories:
+      - user.contact.state
+    - name: uuid
+      description: User's unique ID
+      data_categories:
+      - user.unique_id

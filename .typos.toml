@@ -1,0 +1,7 @@
+[default.extend-words]
+# Fideslang keys and names that look like typos to `typos` but are real.
+fides = "fides"
+ba = "ba"
+
+[files]
+extend-exclude = ["taxonomy/**", "tests/fixtures/**", "tests/snapshots/**", "CHANGELOG.md"]
