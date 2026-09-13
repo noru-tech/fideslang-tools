@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-13
+
 ### Added
 - Initial `fl` command-line tool for working with Fideslang taxonomies and Fides manifests.
 - Bundled, offline snapshot of the IAB Tech Lab Privacy Taxonomy (IABTechLab/fideslang 3.0.0).
@@ -15,4 +17,5 @@ All notable changes to this project are documented here. The format is based on
 - `fl graph` rendering system/dataset/data-use relationships as Graphviz DOT or Mermaid.
 - Shell completions (`fl completions`) and man pages (`fl manpage`).
 
-[Unreleased]: https://github.com/noru-tech/fideslang-tools/commits/main
+[Unreleased]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/noru-tech/fideslang-tools/releases/tag/v0.1.0
