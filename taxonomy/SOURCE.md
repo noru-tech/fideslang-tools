@@ -1,38 +1,39 @@
 # Taxonomy snapshot provenance
 
-The YAML files under `taxonomy/ethyca/` and `taxonomy/iab/` are **vendored snapshots** of the
-Fideslang default taxonomy. They are compiled into the `fl` binary (`include_str!`) so the tool
-works offline and never needs the `fideslang` Python package at runtime.
+The YAML files in this directory are a **vendored snapshot** of the IAB Tech Lab Privacy Taxonomy
+(Fideslang). They are compiled into the `fl` binary (`include_str!`) so the tool works offline and
+never needs the `fideslang` Python package at runtime.
+
+## Snapshot
+
+| Field | Value |
+| --- | --- |
+| Upstream | https://github.com/IABTechLab/fideslang |
+| Release tag | `3.0.0` |
+| Commit | `c53726c9d9eeebb6b43bf56d53c29b53fc07249e` |
+| Snapshot date | 2026-09-13 |
+| Data categories | 85 |
+| Data uses | 55 |
+| Data subjects | 15 |
+
+A machine-readable copy lives in `snapshot.json` and is what `fl taxonomy info` prints. `cargo test`
+asserts that the parsed files match these counts.
 
 ## License and attribution
 
-The Fideslang taxonomy is © Ethyca, Inc. / IAB Tech Lab and licensed under **Creative Commons
-Attribution 4.0 International (CC BY 4.0)** — https://creativecommons.org/licenses/by/4.0/. These
-files are a *modified* redistribution: the upstream Python definitions were exported to YAML using
-the upstream data model. See the repository `NOTICE` file. The Rust code in this repository is
-MIT-licensed; this directory remains CC BY 4.0.
-
-## Snapshots
-
-| Snapshot | Upstream | Tag | Commit | Categories | Uses | Subjects |
-| --- | --- | --- | --- | ---: | ---: | ---: |
-| `ethyca` (default) | https://github.com/ethyca/fideslang | `3.1.4` | `7c27b5a5cfc8a46a299506fdf116383432813518` | 85 | 56 | 15 |
-| `iab` | https://github.com/IABTechLab/fideslang | `3.0.0` | `c53726c9d9eeebb6b43bf56d53c29b53fc07249e` | 85 | 55 | 15 |
-
-Snapshot date: 2026-09-13 (machine-readable copy in each directory's `snapshot.json`).
-
-The only content difference between the two: `ethyca` adds the data use
-`functional.storage.privacy_preferences` (parent `functional.storage`). Data categories and data
-subjects are identical. `fl taxonomy diff` shows this.
+The taxonomy is licensed under **Creative Commons Attribution 4.0 International (CC BY 4.0)** —
+https://creativecommons.org/licenses/by/4.0/. Copyright holders per upstream: Ethyca, Inc. (original
+author) and IAB Tech Lab (current steward). These files are a *modified* redistribution: the
+upstream Python definitions were exported to YAML using the upstream data model. See the repository
+`NOTICE` file. The Rust code in this repository is MIT-licensed; this directory remains CC BY 4.0.
 
 ## Why the Python source, not `data_files/`
 
-Both upstream repositories ship `data_files/{data_categories,data_uses,data_subjects}.{yml,json,csv}`,
+The upstream repository ships `data_files/{data_categories,data_uses,data_subjects}.{yml,json,csv}`,
 but that directory is a **stale export**: it was last regenerated on 2023-12-15 (commit `ffe60ac1`,
-"Fideslang 3.0") and contains 54 data uses, while the Python source at the same tags contains 55
-(IAB 3.0.0) and 56 (Ethyca 3.1.4). The source of truth is
-`src/fideslang/default_taxonomy/{data_categories,data_uses,data_subjects}.py`, so the refresh script
-installs the package at the pinned tag and exports from it.
+"Fideslang 3.0") and contains 54 data uses, while the Python source at tag 3.0.0 contains 55. The
+source of truth is `src/fideslang/default_taxonomy/{data_categories,data_uses,data_subjects}.py`, so
+the refresh script installs the package at the pinned tag and exports from it.
 
 ## Record shape
 
@@ -56,9 +57,8 @@ Top-level keys are singular (`data_category`, `data_use`, `data_subject`), match
 ## How to refresh
 
 ```bash
-scripts/refresh-taxonomy.sh ethyca <tag>
-scripts/refresh-taxonomy.sh iab    <tag>
+scripts/refresh-taxonomy.sh <tag>
 ```
 
-Then update the table above, `CHANGELOG.md`, and run `cargo test` (the counts in `snapshot.json`
-are asserted against the parsed files).
+Then update the table above and `CHANGELOG.md`, review `git diff taxonomy/` (a *removed* key can
+break users' manifests, so call it out), and run `cargo test`.

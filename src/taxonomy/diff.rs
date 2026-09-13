@@ -132,20 +132,21 @@ pub fn diff(from: &Taxonomy, to: &Taxonomy, kinds: &[Kind]) -> TaxonomyDiff {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::taxonomy::{Snapshot, embedded};
+    use crate::taxonomy::embedded;
 
     #[test]
-    fn iab_to_ethyca_adds_exactly_one_data_use() {
-        let d = diff(
-            embedded::load(Snapshot::Iab),
-            embedded::load(Snapshot::Ethyca),
-            &Kind::ALL,
-        );
-        assert_eq!(d.totals(), (1, 0, 0));
+    fn extension_shows_as_added_and_override_as_changed() {
+        let base = embedded::load();
+        let mut custom = TaxonomyRecord::new("analytics.reporting.custom");
+        custom.name = Some("Custom".into());
+        let mut renamed = base.get(Kind::Use, "analytics").unwrap().clone();
+        renamed.name = Some("Renamed".into());
+        let ext = base.extended_with([(Kind::Use, custom), (Kind::Use, renamed)]);
+        let d = diff(base, &ext, &Kind::ALL);
+        assert_eq!(d.totals(), (1, 0, 1));
         let uses = d.kinds.iter().find(|k| k.kind == Kind::Use).unwrap();
-        assert_eq!(
-            uses.added[0].fides_key,
-            "functional.storage.privacy_preferences"
-        );
+        assert_eq!(uses.added[0].fides_key, "analytics.reporting.custom");
+        assert_eq!(uses.changed[0].changes[0].field, "name");
+        assert!(diff(base, base, &Kind::ALL).is_empty());
     }
 }

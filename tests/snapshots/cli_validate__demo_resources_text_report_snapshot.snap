@@ -16,4 +16,4 @@ expression: out
   E001 unknown data category `user.cookie_id` — did you mean `user.device.cookie_id`, `user.device.cookie`, `user.unique_id`?
 <demo>/demo_system.yml  system[demo_marketing_system].privacy_declarations[0].data_use
   E001 unknown data use `advertising` — did you mean `marketing.advertising`?
-5 files, 7 resources checked against ethyca 3.1.4: 6 errors, 1 warning
+5 files, 7 resources checked against iab 3.0.0: 6 errors, 1 warning

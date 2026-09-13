@@ -116,11 +116,11 @@ pub fn search<'a>(tax: &'a Taxonomy, kinds: &[Kind], m: &Matcher, keys_only: boo
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::taxonomy::{Snapshot, embedded};
+    use crate::taxonomy::embedded;
 
     #[test]
     fn substring_and_regex_search() {
-        let tax = embedded::load(Snapshot::Ethyca);
+        let tax = embedded::load();
         let m = Matcher::new("cookie", false, false).unwrap();
         let hits = search(tax, &[Kind::Category], &m, true);
         assert!(

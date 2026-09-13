@@ -2,7 +2,7 @@
 source: tests/cli_taxonomy.rs
 expression: dot
 ---
-digraph "fideslang ethyca 3.1.4" {
+digraph "fideslang iab 3.0.0" {
   rankdir=LR;
   node [fontname="Helvetica,Arial,sans-serif", fontsize=10];
   edge [fontname="Helvetica,Arial,sans-serif", fontsize=8, color="#64748b"];

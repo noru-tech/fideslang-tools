@@ -158,16 +158,16 @@ pub fn validate(manifest: &Manifest, taxonomy: &Taxonomy, opts: &Options) -> Rep
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::taxonomy::{Snapshot, embedded};
+    use crate::taxonomy::embedded;
     use std::path::Path;
 
-    /// Upstream's demo manifests predate Fideslang 3.x: several keys they use were renamed.
+    /// Upstream's demo manifests predate Fideslang 3.0: several keys they use were renamed.
     /// That makes them a realistic fixture for E001.
     #[test]
     fn demo_resources_report_the_stale_keys() {
         let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/demo_resources");
         let m = crate::manifest::load::load(&[dir], None).unwrap();
-        let report = validate(&m, embedded::load(Snapshot::Ethyca), &Options::default());
+        let report = validate(&m, embedded::load(), &Options::default());
         let e001: Vec<&Diagnostic> = report
             .diagnostics
             .iter()

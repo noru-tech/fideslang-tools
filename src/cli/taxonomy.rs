@@ -16,7 +16,7 @@ use crate::render::table::Table;
 use crate::render::tree::{Guides, TreeNode};
 use crate::render::{dot, mermaid, tree};
 use crate::taxonomy::search::Matcher;
-use crate::taxonomy::{Kind, Snapshot, Taxonomy, TaxonomyRecord, diff, embedded, search};
+use crate::taxonomy::{Kind, Taxonomy, TaxonomyRecord, diff, embedded, search};
 
 #[derive(Debug, Subcommand)]
 pub enum Cmd {
@@ -30,7 +30,7 @@ pub enum Cmd {
     Show(ShowArgs),
     /// Search keys, names and descriptions.
     Search(SearchArgs),
-    /// Compare two snapshots, or a snapshot against a manifest's custom taxonomy.
+    /// Compare the bundled taxonomy against the custom taxonomy declared in manifests.
     Diff(DiffArgs),
     /// Print snapshot provenance (upstream, tag, commit, date, counts).
     Info(InfoArgs),
@@ -140,15 +140,9 @@ pub struct SearchArgs {
 
 #[derive(Debug, Args)]
 pub struct DiffArgs {
-    /// Baseline snapshot.
-    #[arg(long, value_enum, default_value = "iab")]
-    pub from: Snapshot,
-    /// Target snapshot (ignored with --against).
-    #[arg(long, value_enum, default_value = "ethyca")]
-    pub to: Snapshot,
-    /// Compare --taxonomy against the custom taxonomy declared in these manifest paths.
-    #[arg(long, value_name = "PATH", num_args = 1.., conflicts_with_all = ["from", "to"])]
-    pub against: Vec<PathBuf>,
+    /// Manifest files or directories whose data_category / data_use / data_subject resources
+    /// extend or override the bundled taxonomy (default: ./.fides/).
+    pub paths: Vec<PathBuf>,
     /// Restrict to a kind (repeatable).
     #[arg(long = "kind", value_parser = parse_kind, value_name = "KIND")]
     pub kinds: Vec<Kind>,
@@ -163,9 +157,6 @@ pub struct DiffArgs {
 pub struct InfoArgs {
     #[arg(long, value_enum, default_value = "text")]
     pub format: TextFormat,
-    /// Show every bundled snapshot, not just the selected one.
-    #[arg(long)]
-    pub all: bool,
 }
 
 pub fn run(ctx: &mut Ctx, cmd: Cmd) -> Result<Exit> {
@@ -262,7 +253,7 @@ fn list(ctx: &mut Ctx, a: ListArgs) -> Result<Exit> {
 }
 
 fn cat(ctx: &mut Ctx, a: CatArgs) -> Result<Exit> {
-    let raw = embedded::raw(ctx.global.taxonomy, a.kind);
+    let raw = embedded::raw(a.kind);
     match a.format {
         Format::Yaml => ctx.out.write_all(raw.as_bytes())?,
         other => {
@@ -682,33 +673,22 @@ fn diff_cmd(ctx: &mut Ctx, a: DiffArgs) -> Result<Exit> {
     } else {
         a.kinds.clone()
     };
-    let extended;
-    let (from, to): (&Taxonomy, &Taxonomy) = if a.against.is_empty() {
-        (embedded::load(a.from), embedded::load(a.to))
-    } else {
-        let m = crate::manifest::load::load(&a.against, None)
-            .context("loading manifests for --against")?;
-        let custom = m.custom_taxonomy();
-        let mut ext = ctx.tax.extended_with(custom);
-        let label = a
-            .against
-            .iter()
-            .map(|p| p.display().to_string())
-            .collect::<Vec<_>>()
-            .join(", ");
-        ext = {
-            let mut t = ext.clone();
-            let mut prov = t.provenance().clone();
-            prov.snapshot = format!("{} + {label}", ctx.tax.provenance().snapshot);
-            t = Taxonomy::new(prov);
-            for k in Kind::ALL {
-                t.set_kind(k, ext.table(k).clone());
-            }
-            t
-        };
-        extended = ext;
-        (ctx.tax, &extended)
-    };
+    let paths = crate::manifest::load::default_paths(a.paths)?;
+    let m = crate::manifest::load::load(&paths, None).context("loading manifests")?;
+    let label = paths
+        .iter()
+        .map(|p| p.display().to_string())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let ext = ctx.tax.extended_with(m.custom_taxonomy());
+    let mut prov = ext.provenance().clone();
+    prov.snapshot = format!("{} + custom taxonomy in {label}", ctx.tax.label());
+    prov.tag = String::new();
+    let mut to = Taxonomy::new(prov);
+    for k in Kind::ALL {
+        to.set_kind(k, ext.table(k).clone());
+    }
+    let (from, to): (&Taxonomy, &Taxonomy) = (ctx.tax, &to);
     let d = diff::diff(from, to, &kinds);
     match a.format {
         TextFormat::Text => {
@@ -802,49 +782,33 @@ fn diff_cmd(ctx: &mut Ctx, a: DiffArgs) -> Result<Exit> {
 }
 
 fn info(ctx: &mut Ctx, a: InfoArgs) -> Result<Exit> {
-    let snapshots: Vec<Snapshot> = if a.all {
-        Snapshot::ALL.to_vec()
-    } else {
-        vec![ctx.global.taxonomy]
-    };
+    let tax = ctx.tax;
+    let p = tax.provenance();
     match a.format {
         TextFormat::Text => {
-            for s in snapshots {
-                let tax = embedded::load(s);
-                let p = tax.provenance();
-                let t = &ctx.theme;
-                let default = if s == Snapshot::default() {
-                    t.paint(t.dim, "  (default)")
-                } else {
-                    String::new()
-                };
-                writeln!(
-                    ctx.out,
-                    "{}{default}",
-                    t.paint(t.heading, &format!("{} {}", p.snapshot, p.tag))
-                )?;
-                writeln!(ctx.out, "  upstream:  {}", p.upstream)?;
-                writeln!(ctx.out, "  commit:    {}", p.commit)?;
-                writeln!(ctx.out, "  snapshot:  {}", p.snapshot_date)?;
-                writeln!(ctx.out, "  license:   {}", p.license)?;
-                let counts = Kind::ALL
-                    .iter()
-                    .map(|k| format!("{} {}", tax.table(*k).len(), k.label()))
-                    .collect::<Vec<_>>()
-                    .join(", ");
-                writeln!(ctx.out, "  contents:  {counts}")?;
-            }
+            let t = &ctx.theme;
+            writeln!(
+                ctx.out,
+                "{}",
+                t.paint(
+                    t.heading,
+                    &format!("IAB Tech Lab Privacy Taxonomy (fideslang {})", p.tag)
+                )
+            )?;
+            writeln!(ctx.out, "  upstream:  {}", p.upstream)?;
+            writeln!(ctx.out, "  tag:       {}", p.tag)?;
+            writeln!(ctx.out, "  commit:    {}", p.commit)?;
+            writeln!(ctx.out, "  snapshot:  {}", p.snapshot_date)?;
+            writeln!(ctx.out, "  license:   {}", p.license)?;
+            let counts = Kind::ALL
+                .iter()
+                .map(|k| format!("{} {}", tax.table(*k).len(), k.label()))
+                .collect::<Vec<_>>()
+                .join(", ");
+            writeln!(ctx.out, "  contents:  {counts}")?;
         }
         TextFormat::Json | TextFormat::Yaml => {
-            let items: Vec<Value> = snapshots
-                .iter()
-                .map(|s| serde_json::to_value(embedded::load(*s).provenance()).unwrap())
-                .collect();
-            let v = if items.len() == 1 {
-                items.into_iter().next().unwrap()
-            } else {
-                Value::Array(items)
-            };
+            let v = serde_json::to_value(p)?;
             let f = if a.format == TextFormat::Json {
                 Format::Json
             } else {

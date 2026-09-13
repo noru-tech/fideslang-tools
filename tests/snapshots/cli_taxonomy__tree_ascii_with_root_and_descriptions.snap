@@ -2,7 +2,7 @@
 source: tests/cli_taxonomy.rs
 expression: out
 ---
-data_use (ethyca 3.1.4)
+data_use (iab 3.0.0)
 `-- analytics  Analytics  — Provides analytics for activities such as system and advertising performance reporting, insights and fraud detection.
     `-- reporting  Analytics for Reporting  — Provides analytics for general reporting such as system and advertising performance.
         |-- ad_performance  Analytics for Advertising Performance  — Provides analytics for reporting of advertising performance.

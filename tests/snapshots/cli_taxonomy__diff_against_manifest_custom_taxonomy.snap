@@ -1,0 +1,11 @@
+---
+source: tests/cli_taxonomy.rs
+expression: "out.replace(&common::demo().display().to_string(), \"<demo>\")"
+---
+iab 3.0.0 → iab 3.0.0 + custom taxonomy in <demo>
+data_category: no changes (85)
+data_use: 55 → 56
+  + third_party_sharing.personalized_advertising.direct_marketing  Direct Marketing  (parent third_party_sharing.personalized_advertising)
+data_subject: 15 → 16
+  + potential_customer  Potential Customer
+2 added, 0 removed, 0 changed

@@ -17,7 +17,7 @@ use clap::{Args, Parser, Subcommand};
 
 use crate::Exit;
 use crate::render::{ColorChoice, Output, Theme};
-use crate::taxonomy::{Snapshot, Taxonomy, embedded};
+use crate::taxonomy::{Taxonomy, embedded};
 
 const ABOUT: &str = "fl — work with Fideslang taxonomies and Fides manifests";
 const LONG_ABOUT: &str = "\
@@ -25,8 +25,8 @@ fl — work with Fideslang taxonomies and Fides manifests.
 
 Browse and visualize the Fideslang privacy taxonomy (data categories, data uses, data subjects),
 and cat, convert, merge, split, validate, summarize and graph Fides manifests (datasets, systems,
-policies, organizations). Two taxonomy snapshots are compiled in: ethyca/fideslang 3.1.4 (default)
-and IABTechLab/fideslang 3.0.0; pick one with --taxonomy. Nothing touches the network.
+policies, organizations). The IAB Tech Lab Privacy Taxonomy (fideslang 3.0.0) is compiled in, so
+nothing touches the network.
 
 Exit codes: 0 ok · 1 findings (validate errors, non-empty diff with --exit-code) · 2 usage/IO error.";
 
@@ -41,16 +41,6 @@ pub struct Cli {
 
 #[derive(Debug, Clone, Args)]
 pub struct Global {
-    /// Which vendored taxonomy snapshot to use.
-    #[arg(
-        long,
-        global = true,
-        env = "FL_TAXONOMY",
-        default_value = "ethyca",
-        value_enum
-    )]
-    pub taxonomy: Snapshot,
-
     /// When to use colors.
     #[arg(
         long,
@@ -117,7 +107,7 @@ pub fn run(cli: Cli) -> Result<Exit> {
     cli.global.color.apply();
     let mut ctx = Ctx {
         theme: Theme::default(),
-        tax: embedded::load(cli.global.taxonomy),
+        tax: embedded::load(),
         out: Output::open(cli.global.output.as_deref())?,
         global: cli.global,
     };

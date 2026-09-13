@@ -20,7 +20,6 @@ pub fn invalid(name: &str) -> PathBuf {
 pub fn fl() -> Command {
     let mut cmd = Command::cargo_bin("fl").expect("fl binary");
     cmd.env("NO_COLOR", "1")
-        .env_remove("FL_TAXONOMY")
         .env_remove("FL_COLOR")
         .arg("--color")
         .arg("never");

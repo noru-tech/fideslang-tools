@@ -60,11 +60,11 @@ pub fn format(suggestions: &[String]) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::taxonomy::{Kind, Snapshot, embedded};
+    use crate::taxonomy::{Kind, embedded};
 
     #[test]
     fn suggests_plausible_keys() {
-        let tax = embedded::load(Snapshot::Ethyca);
+        let tax = embedded::load();
         let s = suggest("user.cookie_id", tax.table(Kind::Category), 3);
         assert_eq!(s.first().map(String::as_str), Some("user.device.cookie_id"));
         let s = suggest("advertising", tax.table(Kind::Use), 3);

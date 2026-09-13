@@ -4,8 +4,8 @@
 //! result to an exit code.
 //!
 //! Design in one paragraph: every input file (YAML, JSON, CSV) is parsed into a
-//! [`serde_json::Value`] with key order preserved. The vendored taxonomy snapshots are compiled into
-//! the binary and parsed lazily. Commands operate on `Value`s and on the typed
+//! [`serde_json::Value`] with key order preserved. The vendored IAB Tech Lab taxonomy snapshot is compiled
+//! into the binary and parsed lazily. Commands operate on `Value`s and on the typed
 //! [`taxonomy::Taxonomy`]; renderers turn results into terminal trees, tables, Graphviz DOT or
 //! Mermaid. Nothing here touches the network.
 

@@ -1,7 +1,7 @@
 # fideslang-tools
 
 > `fl` — a fast, offline command-line toolbox for [Fideslang](https://github.com/IABTechLab/fideslang)
-> privacy taxonomies and [Fides](https://github.com/ethyca/fides) manifests: browse, search and draw
+> privacy taxonomy and Fideslang manifests: browse, search and draw
 > the taxonomy; cat, convert, merge, split, validate, summarize and graph your data maps.
 
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](./LICENSE)
@@ -9,22 +9,20 @@
 [![ci](https://github.com/noru-tech/fideslang-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/noru-tech/fideslang-tools/actions/workflows/ci.yml)
 [![crates.io](https://img.shields.io/crates/v/fideslang-cli.svg)](https://crates.io/crates/fideslang-cli)
 
-Fideslang is the IAB Tech Lab / Ethyca privacy taxonomy: hierarchical **data categories**
-(`user.contact.email`), **data uses** (`marketing.advertising`) and **data subjects** (`customer`),
-plus a YAML manifest language for describing **datasets**, **systems**, **policies** and
-**organizations** with those labels. Upstream ships it as a Python library. `fl` is a single static
-binary that makes the taxonomy and your manifests easy to explore and work with from a terminal, a
-script or CI, with no Python and no network.
+The [IAB Tech Lab Privacy Taxonomy](https://github.com/IABTechLab/fideslang) (Fideslang) is the
+industry-standard vocabulary for describing personal data and how it is processed: hierarchical
+**data categories** (`user.contact.email`), **data uses** (`marketing.advertising`) and **data
+subjects** (`customer`), plus a YAML manifest language for describing **datasets**, **systems**,
+**policies** and **organizations** with those labels. It is governed by IAB Tech Lab's Privacy
+Implementation & Accountability Task Force and maps onto GDPR, CCPA/CPRA, LGPD and ISO 19944, which
+makes it the canonical, standards-body-backed way to label a data map so that it interoperates with
+other vendors, consent frameworks (TCF/GVL) and privacy tooling.
 
-Two taxonomy snapshots are compiled in and selectable with `--taxonomy`:
-
-| Snapshot | Upstream | Tag | Categories / uses / subjects |
-| --- | --- | --- | --- |
-| `ethyca` (default) | [ethyca/fideslang](https://github.com/ethyca/fideslang) | 3.1.4 | 85 / 56 / 15 |
-| `iab` | [IABTechLab/fideslang](https://github.com/IABTechLab/fideslang) | 3.0.0 | 85 / 55 / 15 |
-
-The only difference between them is one data use (`fl taxonomy diff` shows it). Provenance,
-license and the refresh recipe live in [`taxonomy/SOURCE.md`](./taxonomy/SOURCE.md).
+Upstream ships the taxonomy as a Python library. `fl` is a single static binary that makes the
+taxonomy and your manifests easy to explore and work with from a terminal, a script or CI, with no
+Python and no network. It bundles the **IAB Tech Lab fideslang 3.0.0** taxonomy (85 data categories,
+55 data uses, 15 data subjects); provenance, license and the refresh recipe live in
+[`taxonomy/SOURCE.md`](./taxonomy/SOURCE.md).
 
 ## Install
 
@@ -64,7 +62,7 @@ Shell completions and man pages: `fl completions zsh|bash|fish|…` and `fl manp
 
 ```console
 $ fl taxonomy tree categories --depth 2
-data_category (ethyca 3.1.4)
+data_category (iab 3.0.0)
 ├── system  System Data
 │   ├── authentication  Authentication Data
 │   └── operations  Operations Data
@@ -74,10 +72,10 @@ data_category (ethyca 3.1.4)
     ├── behavior  Observed Behavior
     …
     └── workplace  Workplace
-28 keys shown, depth ≤ 2 (ethyca 3.1.4)
+28 keys shown, depth ≤ 2 (iab 3.0.0)
 
 $ fl taxonomy show user.contact.email
-user.contact.email  —  User Contact Email  [data_category · ethyca 3.1.4 · added 2.0.0]
+user.contact.email  —  User Contact Email  [data_category · iab 3.0.0 · added 2.0.0]
   User's contact email address.
 ancestors:   user › user.contact › user.contact.email
 children:    (none)
@@ -86,13 +84,6 @@ $ fl taxonomy search cookie --keys-only
 cat   user.device.cookie  Device Cookie
 cat   user.device.cookie_id  Cookie ID
 
-$ fl taxonomy diff
-iab 3.0.0 → ethyca 3.1.4
-data_category: no changes (85)
-data_use: 55 → 56
-  + functional.storage.privacy_preferences  Local Data Storage for Privacy Preferences  (parent functional.storage)
-data_subject: no changes (15)
-1 added, 0 removed, 0 changed
 ```
 
 `fl taxonomy tree` also emits Graphviz DOT, Mermaid or nested JSON (`--format dot|mermaid|json`,
@@ -115,7 +106,7 @@ tests/fixtures/demo_resources/demo_system.yml  system[demo_marketing_system].pri
 tests/fixtures/demo_resources/demo_system.yml  system[demo_marketing_system].privacy_declarations[0].data_use
   E001 unknown data use `advertising` — did you mean `marketing.advertising`?
   …
-5 files, 7 resources checked against ethyca 3.1.4: 6 errors, 1 warning
+5 files, 7 resources checked against iab 3.0.0: 6 errors, 1 warning
 $ echo $?
 1
 ```
@@ -162,8 +153,8 @@ $ fl stats .fides/ --rollup
 | `fl taxonomy tree [kind]` | Hierarchy as a terminal tree, DOT, Mermaid or JSON (`--depth`, `--root`, `--descriptions`) |
 | `fl taxonomy show KEY` | One key with description, ancestors, children and version metadata |
 | `fl taxonomy search PATTERN` | Substring or `--regex` search over keys, names and descriptions |
-| `fl taxonomy diff` | Compare snapshots (`--from iab --to ethyca`) or a snapshot against a manifest's custom taxonomy (`--against PATH`) |
-| `fl taxonomy info` | Snapshot provenance: upstream, tag, commit, date, counts (`--all`) |
+| `fl taxonomy diff PATH…` | Show what a manifest set's custom `data_category` / `data_use` / `data_subject` resources add to or override in the bundled taxonomy |
+| `fl taxonomy info` | Bundled taxonomy provenance: upstream, tag, commit, date, counts |
 | `fl cat PATH…` | Print manifests as YAML, JSON or a resource tree; filter with `--type` and `--key GLOB` |
 | `fl convert INPUT` | Convert one file between YAML, JSON and CSV (`--to`, or inferred from `-o`) |
 | `fl merge PATH…` | Union many files into one document (`--fail-on-duplicate`, `--dedupe`) |
@@ -173,8 +164,7 @@ $ fl stats .fides/ --rollup
 | `fl graph PATH…` | Systems ↔ datasets ↔ flows ↔ uses/categories/subjects as DOT, Mermaid or JSON (`--include`, `--focus KEY --depth N`) |
 | `fl completions <shell>` / `fl manpage` | Shell completions and man pages |
 
-Global flags: `--taxonomy ethyca|iab` (or `FL_TAXONOMY`), `--color auto|always|never` (honors
-`NO_COLOR`), `-o FILE`, `-q`.
+Global flags: `--color auto|always|never` (honors `NO_COLOR`), `-o FILE`, `-q`.
 
 Exit codes: `0` ok · `1` findings (validation errors, or a non-empty `diff --exit-code`) ·
 `2` usage, I/O or parse error.
@@ -208,7 +198,7 @@ error, `--allow CODE` silences it, `-W` treats every warning as an error. `--for
   (2-space indent, block sequences flush with their key).
 - Unknown fields on any resource are preserved through `cat`, `convert`, `merge` and `split`.
 - Directory loading unions files in sorted path order, like upstream's `ingest_manifests`.
-- The demo manifests bundled as test fixtures come from upstream and predate Fideslang 3.x; they
+- The demo manifests bundled as test fixtures come from upstream and predate Fideslang 3.0; they
   deliberately fail validation and make a good playground: `fl validate tests/fixtures/demo_resources`.
 
 ## Development
@@ -224,7 +214,6 @@ refresh a taxonomy snapshot.
 
 ## License
 
-The Rust code is MIT-licensed (see [LICENSE](./LICENSE)). The vendored Fideslang taxonomy under
-`taxonomy/` and the demo fixtures under `tests/fixtures/demo_resources/` are © Ethyca, Inc. / IAB
-Tech Lab and remain under CC BY 4.0 — see [NOTICE](./NOTICE) and
-[`taxonomy/SOURCE.md`](./taxonomy/SOURCE.md).
+The Rust code is MIT-licensed (see [LICENSE](./LICENSE)). The vendored IAB Tech Lab Privacy Taxonomy
+under `taxonomy/` and the demo fixtures under `tests/fixtures/demo_resources/` remain under
+CC BY 4.0 — see [NOTICE](./NOTICE) and [`taxonomy/SOURCE.md`](./taxonomy/SOURCE.md) for attribution.

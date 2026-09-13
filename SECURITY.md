@@ -26,7 +26,7 @@ triage. We will credit reporters who wish to be named once a fix is released.
 
 `fl` is a local command-line tool:
 
-- It performs **no network calls** at runtime. The taxonomy snapshots are compiled into the binary.
+- It performs **no network calls** at runtime. The taxonomy snapshot is compiled into the binary.
 - It reads the manifest files you point it at and writes only where you tell it to (`-o`,
   `--out-dir`).
 - Release binaries are built by GitHub Actions from tagged commits, published with SHA-256 checksums

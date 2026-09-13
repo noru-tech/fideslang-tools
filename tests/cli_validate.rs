@@ -122,18 +122,25 @@ fn custom_taxonomy_is_honoured_unless_disabled() {
 }
 
 #[test]
-fn iab_snapshot_rejects_ethyca_only_key() {
+fn keys_outside_the_iab_taxonomy_are_rejected() {
+    // `functional.storage.privacy_preferences` exists only in a downstream fork, not in the
+    // IAB Tech Lab 3.0.0 taxonomy that fl bundles.
     let dir = tempfile::tempdir().unwrap();
     std::fs::write(
         dir.path().join("s.yml"),
         "system:\n- fides_key: s\n  system_type: Service\n  privacy_declarations:\n  - name: d\n    data_use: functional.storage.privacy_preferences\n    data_categories: [user.name]\n    data_subjects: [customer]\n",
     )
     .unwrap();
-    fl().args(["validate"]).arg(dir.path()).assert().success();
-    fl().args(["--taxonomy", "iab", "validate"])
+    fl().args(["validate"])
         .arg(dir.path())
         .assert()
-        .code(1);
+        .code(1)
+        .stdout(predicate::str::contains(
+            "unknown data use `functional.storage.privacy_preferences`",
+        ))
+        .stdout(predicate::str::contains(
+            "did you mean `functional.storage`",
+        ));
 }
 
 #[test]

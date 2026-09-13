@@ -8,23 +8,21 @@ exceptions noted below.
 Third-party attribution
 ================================================================================
 
-This product includes the Fideslang privacy taxonomy.
+This product includes the IAB Tech Lab Privacy Taxonomy (Fideslang).
 
   Fideslang — https://github.com/IABTechLab/fideslang
-              https://github.com/ethyca/fideslang
-  Copyright (c) Ethyca, Inc. / IAB Tech Lab
+  Copyright (c) Ethyca, Inc. and IAB Tech Lab
   Licensed under the Creative Commons Attribution 4.0 International License
   (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/
 
-The taxonomy data files under `taxonomy/ethyca/` and `taxonomy/iab/`
-(data_categories.yml, data_uses.yml, data_subjects.yml) are a MODIFIED
-redistribution of Fideslang: the upstream Python definitions in
-`src/fideslang/default_taxonomy/*.py` at a pinned release tag were exported to
-YAML using the upstream data model. No endorsement by Ethyca, Inc. or IAB Tech
-Lab is implied.
+The taxonomy data files under `taxonomy/` (data_categories.yml, data_uses.yml,
+data_subjects.yml) are a MODIFIED redistribution of Fideslang: the upstream
+Python definitions in `src/fideslang/default_taxonomy/*.py` at release tag
+3.0.0 were exported to YAML using the upstream data model. No endorsement by
+the copyright holders is implied.
 
 The example manifests under `tests/fixtures/demo_resources/` are copied
-verbatim from the `demo_resources/` directory of ethyca/fideslang 3.1.4.
+verbatim from the `demo_resources/` directory of IABTechLab/fideslang 3.0.0.
 
 These files remain licensed under CC BY 4.0; the MIT License covering the rest
 of this repository does not apply to them. See `taxonomy/SOURCE.md` for the

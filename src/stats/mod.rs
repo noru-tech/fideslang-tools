@@ -158,14 +158,14 @@ pub fn compute(m: &Manifest, tax: &Taxonomy, rollup: bool) -> Stats {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::taxonomy::{Snapshot, embedded};
+    use crate::taxonomy::embedded;
     use std::path::Path;
 
     #[test]
     fn demo_resources_stats() {
         let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/demo_resources");
         let m = crate::manifest::load::load(&[dir], None).unwrap();
-        let s = compute(&m, embedded::load(Snapshot::Ethyca), true);
+        let s = compute(&m, embedded::load(), true);
         assert_eq!(s.datasets.fields, 6);
         assert_eq!(s.datasets.categorized_fields, 5);
         assert_eq!(

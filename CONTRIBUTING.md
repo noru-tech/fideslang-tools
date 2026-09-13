@@ -6,9 +6,9 @@ rules and docs are all welcome.
 ## Ground rules
 
 - Be respectful — see [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
-- `fl` is **offline and self-contained**: the taxonomy snapshots are compiled into the binary and
+- `fl` is **offline and self-contained**: the taxonomy snapshot is compiled into the binary and
   the tool never touches the network at runtime. Keep it that way.
-- Don't hand-edit anything under `taxonomy/`. It is a generated snapshot — see *Updating a taxonomy
+- Don't hand-edit anything under `taxonomy/`. It is a generated snapshot — see *Updating the taxonomy
   snapshot* below.
 - Keep the dependency tree pure Rust (no C libraries) so static musl builds keep working.
 
@@ -23,7 +23,7 @@ src/render/     terminal tree, tables, Graphviz DOT, Mermaid
 src/graph/      relationship graph built from a manifest set
 src/validate/   diagnostics and rules (E0xx errors, W0xx warnings)
 src/stats/      counts and usage summaries
-taxonomy/       vendored snapshots (CC BY 4.0) + SOURCE.md provenance
+taxonomy/       vendored IAB Tech Lab snapshot (CC BY 4.0) + SOURCE.md provenance
 tests/          integration tests (assert_cmd) and insta snapshots; fixtures under tests/fixtures
 scripts/        refresh-taxonomy.sh + export_taxonomy.py
 ```
@@ -52,18 +52,17 @@ Adding a validation rule: add a file under `src/validate/rules/`, give it the ne
 (`E0xx` for errors, `W0xx` for warnings), register it in `src/validate/mod.rs`, add a minimal failing
 fixture under `tests/fixtures/invalid/`, and document it in the README table.
 
-## Updating a taxonomy snapshot
+## Updating the taxonomy snapshot
 
 ```bash
-scripts/refresh-taxonomy.sh ethyca 3.1.4
-scripts/refresh-taxonomy.sh iab    3.0.0
+scripts/refresh-taxonomy.sh 3.0.0
 ```
 
-The script installs `fideslang` at that tag into a throw-away virtualenv, exports the taxonomy from
-the Python source (upstream's `data_files/` directory is a stale export and must not be used), and
-writes `taxonomy/<snapshot>/snapshot.json`. Then update `taxonomy/SOURCE.md` and `CHANGELOG.md`,
-review the diff (a *removed* key can break users' manifests, so call it out), and run `cargo test`
-(the counts in `snapshot.json` are asserted).
+The script installs `fideslang` at that tag from `IABTechLab/fideslang` into a throw-away
+virtualenv, exports the taxonomy from the Python source (upstream's `data_files/` directory is a
+stale export and must not be used), and writes `taxonomy/snapshot.json`. Then update
+`taxonomy/SOURCE.md` and `CHANGELOG.md`, review the diff (a *removed* key can break users' manifests,
+so call it out), and run `cargo test` (the counts in `snapshot.json` are asserted).
 
 ## Releases
 

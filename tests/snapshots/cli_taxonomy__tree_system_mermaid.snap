@@ -3,7 +3,7 @@ source: tests/cli_taxonomy.rs
 expression: mmd
 ---
 flowchart LR
-  %% fideslang ethyca 3.1.4
+  %% fideslang iab 3.0.0
   classDef system fill:#dbeafe,stroke:#1d4ed8
   classDef dataset fill:#dcfce7,stroke:#15803d
   classDef collection fill:#f0fdf4,stroke:#15803d

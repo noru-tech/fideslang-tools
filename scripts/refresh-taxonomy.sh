@@ -1,34 +1,29 @@
 #!/usr/bin/env bash
-# Refresh a vendored Fideslang taxonomy snapshot from a pinned upstream release tag.
+# Refresh the vendored IAB Tech Lab Privacy Taxonomy snapshot from a pinned upstream release tag.
 #
-#   scripts/refresh-taxonomy.sh ethyca 3.1.4
-#   scripts/refresh-taxonomy.sh iab    3.0.0
+#   scripts/refresh-taxonomy.sh 3.0.0
 #
-# Installs `fideslang` at that tag into a throw-away virtualenv, exports the default
-# taxonomy with scripts/export_taxonomy.py into taxonomy/<snapshot>/, and records
-# provenance in taxonomy/<snapshot>/snapshot.json. Requires python3 and gh (authenticated).
+# Installs `fideslang` at that tag from github.com/IABTechLab/fideslang into a throw-away
+# virtualenv, exports the default taxonomy with scripts/export_taxonomy.py into taxonomy/, and
+# records provenance in taxonomy/snapshot.json. Requires python3 and gh (authenticated).
 #
-# Why not download upstream's data_files/*.yml? They are a stale export (last
-# regenerated 2023-12); the Python source under src/fideslang/default_taxonomy/ is the
-# source of truth. See taxonomy/SOURCE.md.
+# Why not download upstream's data_files/*.yml? They are a stale export (last regenerated
+# 2023-12); the Python source under src/fideslang/default_taxonomy/ is the source of truth.
+# See taxonomy/SOURCE.md.
 set -euo pipefail
 
-snapshot="${1:-}"; tag="${2:-}"
-case "$snapshot" in
-  ethyca) org="ethyca" ;;
-  iab)    org="IABTechLab" ;;
-  *) echo "usage: $0 <ethyca|iab> <tag>" >&2; exit 2 ;;
-esac
-[[ -n "$tag" ]] || { echo "usage: $0 <ethyca|iab> <tag>" >&2; exit 2; }
+tag="${1:-}"
+[[ -n "$tag" ]] || { echo "usage: $0 <tag>   (e.g. 3.0.0)" >&2; exit 2; }
+org="IABTechLab"
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-out_dir="$repo_root/taxonomy/$snapshot"
+out_dir="$repo_root/taxonomy"
 venv="$(mktemp -d)/venv"
 trap 'rm -rf "$(dirname "$venv")"' EXIT
 
 echo "> installing fideslang@$tag from github.com/$org/fideslang into a temp venv"
 python3 -m venv "$venv"
-"$venv/bin/pip" install --quiet "fideslang @ git+https://github.com/$org/fideslang@$tag"
+"$venv/bin/pip" install --quiet "fideslang @ git+https://github.com/$org/fideslang@$tag" pyyaml
 
 echo "> exporting taxonomy to $out_dir"
 counts="$("$venv/bin/python" "$repo_root/scripts/export_taxonomy.py" "$out_dir" | tail -n1)"
@@ -39,11 +34,11 @@ if [[ "$(gh api "repos/$org/fideslang/git/ref/tags/$tag" --jq .object.type)" == 
   commit="$(gh api "repos/$org/fideslang/git/tags/$commit" --jq .object.sha)"
 fi
 
-python3 - "$out_dir/snapshot.json" "$snapshot" "$org" "$tag" "$commit" "$counts" <<'PY'
+python3 - "$out_dir/snapshot.json" "$org" "$tag" "$commit" "$counts" <<'PY'
 import datetime, json, sys
-path, snapshot, org, tag, commit, counts = sys.argv[1:]
+path, org, tag, commit, counts = sys.argv[1:]
 doc = {
-    "snapshot": snapshot,
+    "snapshot": "iab",
     "upstream": f"https://github.com/{org}/fideslang",
     "tag": tag,
     "commit": commit,
@@ -58,4 +53,4 @@ print(f"> wrote {path}")
 PY
 
 echo
-echo "Done. Now: review 'git diff taxonomy/', update taxonomy/SOURCE.md and CHANGELOG.md."
+echo "Done. Now: review 'git diff taxonomy/', update taxonomy/SOURCE.md and CHANGELOG.md, run cargo test."

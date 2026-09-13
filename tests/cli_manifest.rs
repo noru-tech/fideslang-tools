@@ -90,7 +90,7 @@ fn convert_taxonomy_to_csv_and_back() {
         fl().args(["convert"])
             .arg(concat!(
                 env!("CARGO_MANIFEST_DIR"),
-                "/taxonomy/ethyca/data_uses.yml"
+                "/taxonomy/data_uses.yml"
             ))
             .args(["--to", "csv"]),
     );

@@ -1,5 +1,5 @@
 //! Fideslang taxonomies: the three classification groups (data categories, data uses, data
-//! subjects), their hierarchy, and the vendored snapshots.
+//! subjects), their hierarchy, and the vendored IAB Tech Lab snapshot.
 
 pub mod diff;
 pub mod embedded;
@@ -90,44 +90,6 @@ impl fmt::Display for Kind {
     }
 }
 
-/// Which vendored snapshot to use.
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, Default, clap::ValueEnum, Serialize, Deserialize,
-)]
-#[serde(rename_all = "lowercase")]
-pub enum Snapshot {
-    /// ethyca/fideslang — the actively maintained fork (default).
-    #[default]
-    Ethyca,
-    /// IABTechLab/fideslang — the governed standard.
-    Iab,
-}
-
-impl Snapshot {
-    pub const ALL: [Snapshot; 2] = [Snapshot::Ethyca, Snapshot::Iab];
-
-    pub fn name(self) -> &'static str {
-        match self {
-            Snapshot::Ethyca => "ethyca",
-            Snapshot::Iab => "iab",
-        }
-    }
-
-    pub fn parse(s: &str) -> Option<Snapshot> {
-        match s.trim().to_ascii_lowercase().as_str() {
-            "ethyca" => Some(Snapshot::Ethyca),
-            "iab" | "iabtechlab" | "iab-tech-lab" => Some(Snapshot::Iab),
-            _ => None,
-        }
-    }
-}
-
-impl fmt::Display for Snapshot {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.name())
-    }
-}
-
 /// Contents of a snapshot's `snapshot.json`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Provenance {
@@ -141,9 +103,13 @@ pub struct Provenance {
 }
 
 impl Provenance {
-    /// A label like `ethyca 3.1.4`.
+    /// A label like `iab 3.0.0`.
     pub fn label(&self) -> String {
-        format!("{} {}", self.snapshot, self.tag)
+        if self.tag.is_empty() {
+            self.snapshot.clone()
+        } else {
+            format!("{} {}", self.snapshot, self.tag)
+        }
     }
 
     /// For custom-only taxonomies built from manifests.
@@ -249,7 +215,7 @@ impl Taxonomy {
         &self.provenance
     }
 
-    /// `ethyca 3.1.4`
+    /// `iab 3.0.0`
     pub fn label(&self) -> String {
         self.provenance.label()
     }

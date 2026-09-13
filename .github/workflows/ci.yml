@@ -45,7 +45,7 @@ jobs:
       - name: smoke-test the binary
         run: |
           cargo run -q -- taxonomy info
-          cargo run -q -- taxonomy diff
+          cargo run -q -- taxonomy diff tests/fixtures/demo_resources
           cargo run -q -- validate tests/fixtures/demo_resources || test $? -eq 1
 
   msrv:

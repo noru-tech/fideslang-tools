@@ -4,14 +4,15 @@ use common::{fl, stdout};
 use predicates::prelude::*;
 
 #[test]
-fn info_lists_both_snapshots() {
-    fl().args(["taxonomy", "info", "--all"])
+fn info_describes_the_bundled_snapshot() {
+    fl().args(["taxonomy", "info"])
         .assert()
         .success()
-        .stdout(predicate::str::contains("ethyca 3.1.4"))
-        .stdout(predicate::str::contains("iab 3.0.0"))
         .stdout(predicate::str::contains(
-            "85 categories, 56 uses, 15 subjects",
+            "IAB Tech Lab Privacy Taxonomy (fideslang 3.0.0)",
+        ))
+        .stdout(predicate::str::contains(
+            "https://github.com/IABTechLab/fideslang",
         ))
         .stdout(predicate::str::contains(
             "85 categories, 55 uses, 15 subjects",
@@ -23,7 +24,7 @@ fn info_json_matches_snapshot_file() {
     let out = stdout(fl().args(["taxonomy", "info", "--format", "json"]));
     let v: serde_json::Value = serde_json::from_str(&out).unwrap();
     let recorded: serde_json::Value =
-        serde_json::from_str(include_str!("../taxonomy/ethyca/snapshot.json")).unwrap();
+        serde_json::from_str(include_str!("../taxonomy/snapshot.json")).unwrap();
     assert_eq!(v, recorded);
 }
 
@@ -141,60 +142,23 @@ fn search_substring_and_regex() {
 }
 
 #[test]
-fn diff_iab_to_ethyca() {
-    let out = stdout(fl().args(["taxonomy", "diff"]));
-    insta::assert_snapshot!(out);
-    fl().args(["taxonomy", "diff", "--exit-code"])
-        .assert()
-        .code(1);
-    fl().args([
-        "taxonomy",
-        "diff",
-        "--from",
-        "ethyca",
-        "--to",
-        "ethyca",
-        "--exit-code",
-    ])
-    .assert()
-    .success();
-}
-
-#[test]
 fn diff_against_manifest_custom_taxonomy() {
-    let out = stdout(
-        fl().args(["taxonomy", "diff", "--against"])
-            .arg(common::demo()),
-    );
+    let out = stdout(fl().args(["taxonomy", "diff"]).arg(common::demo()));
+    // Paths differ per machine; normalise the fixture directory.
+    insta::assert_snapshot!(out.replace(&common::demo().display().to_string(), "<demo>"));
     assert!(out.contains("+ third_party_sharing.personalized_advertising.direct_marketing"));
     assert!(out.contains("+ potential_customer"));
     assert!(out.contains("2 added, 0 removed, 0 changed"));
-}
-
-#[test]
-fn taxonomy_flag_selects_snapshot() {
-    fl().args([
-        "--taxonomy",
-        "iab",
-        "taxonomy",
-        "show",
-        "functional.storage.privacy_preferences",
-    ])
-    .assert()
-    .code(2);
-    fl().args([
-        "--taxonomy",
-        "ethyca",
-        "taxonomy",
-        "show",
-        "functional.storage.privacy_preferences",
-    ])
-    .assert()
-    .success();
-    fl().env("FL_TAXONOMY", "iab")
-        .args(["taxonomy", "info"])
+    fl().args(["taxonomy", "diff", "--exit-code"])
+        .arg(common::demo())
         .assert()
-        .stdout(predicate::str::contains("iab 3.0.0"));
+        .code(1);
+    // A manifest set with no custom taxonomy has no differences.
+    fl().args(["taxonomy", "diff", "--exit-code"])
+        .arg(common::demo().join("demo_system.yml"))
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("0 added, 0 removed, 0 changed"));
 }
 
 #[test]
@@ -202,10 +166,7 @@ fn list_formats() {
     let plain = stdout(fl().args(["-q", "taxonomy", "list", "subjects", "--format", "plain"]));
     assert_eq!(plain.lines().count(), 15);
     let csv = stdout(fl().args(["-q", "taxonomy", "list", "uses", "--format", "csv"]));
-    assert!(
-        csv.starts_with("automated_decisions_or_profiling,description,fides_key")
-            || csv.contains("fides_key")
-    );
+    assert!(csv.contains("fides_key"));
     let yaml = stdout(fl().args([
         "-q",
         "taxonomy",
@@ -224,7 +185,7 @@ fn list_formats() {
 #[test]
 fn cat_yaml_is_byte_exact_and_csv_has_root_row() {
     let yaml = stdout(fl().args(["taxonomy", "cat", "subjects"]));
-    assert_eq!(yaml, include_str!("../taxonomy/ethyca/data_subjects.yml"));
+    assert_eq!(yaml, include_str!("../taxonomy/data_subjects.yml"));
     let csv = stdout(fl().args(["taxonomy", "cat", "uses", "--format", "csv"]));
     let mut lines = csv.lines();
     let header = lines.next().unwrap();
