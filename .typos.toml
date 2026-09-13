@@ -2,6 +2,10 @@
 # Fideslang keys and names that look like typos to `typos` but are real.
 fides = "fides"
 ba = "ba"
+# Deliberate misspellings used as inputs for the "did you mean" tests.
+emial = "emial"
+custommer = "custommer"
+advertisin = "advertisin"
 
 [files]
 extend-exclude = ["taxonomy/**", "tests/fixtures/**", "tests/snapshots/**", "CHANGELOG.md"]
