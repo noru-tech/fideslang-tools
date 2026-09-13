@@ -1,0 +1,33 @@
+---
+source: tests/cli_taxonomy.rs
+expression: out
+---
+data_category (ethyca 3.1.4)
+├── system  System Data
+│   ├── authentication  Authentication Data
+│   └── operations  Operations Data
+└── user  User Data
+    ├── account  Account Information
+    ├── authorization  Authorization Information
+    ├── behavior  Observed Behavior
+    ├── biometric  Biometric Data
+    ├── childrens  Children's Data
+    ├── contact  Contact Data
+    ├── content  User Content
+    ├── criminal_history  Criminal History
+    ├── demographic  Demographic Data
+    ├── device  Device Data
+    ├── financial  Financial Data
+    ├── government_id  Government ID
+    ├── health_and_medical  Health and Medical Data
+    ├── job_title  Job Title
+    ├── location  Location Data
+    ├── name  Name
+    ├── payment  Payment Data
+    ├── privacy_preferences  Privacy Preferences
+    ├── sensor  Sensor Data
+    ├── social  Social Data
+    ├── telemetry  Telemetry Data
+    ├── unique_id  Unique ID
+    ├── user_sensor  User Sensor Data
+    └── workplace  Workplace

@@ -1,0 +1,38 @@
+---
+source: tests/cli_graph.rs
+expression: mmd
+---
+flowchart TB
+  %% fides manifest
+  classDef system fill:#dbeafe,stroke:#1d4ed8
+  classDef dataset fill:#dcfce7,stroke:#15803d
+  classDef collection fill:#f0fdf4,stroke:#15803d
+  classDef field fill:#ffffff,stroke:#94a3b8
+  classDef organization fill:#f3e8ff,stroke:#7e22ce
+  classDef policy fill:#fee2e2,stroke:#b91c1c
+  classDef category fill:#cffafe,stroke:#0e7490
+  classDef use fill:#fef9c3,stroke:#a16207
+  classDef subject fill:#e0e7ff,stroke:#4338ca
+  classDef external fill:#f8fafc,stroke:#64748b,stroke-dasharray: 4 2
+  dataset_demo_users_dataset[("demo_users_dataset<br/>Demo Users Dataset")]:::dataset
+  dataset_demo_users_dataset_users[["users"]]:::collection
+  dataset_demo_users_dataset_users_created_at("created_at"):::field
+  dataset_demo_users_dataset_users_email("email"):::field
+  dataset_demo_users_dataset_users_first_name("first_name"):::field
+  dataset_demo_users_dataset_users_food_preference("food_preference"):::field
+  dataset_demo_users_dataset_users_state("state"):::field
+  dataset_demo_users_dataset_users_uuid("uuid"):::field
+  system_demo_analytics_system["demo_analytics_system<br/>Demo Analytics System"]:::system
+  use_improve_system{{"improve.system"}}:::use
+  system_demo_marketing_system["demo_marketing_system<br/>Demo Marketing System"]:::system
+  use_advertising{{"advertising"}}:::use
+  dataset_demo_users_dataset --- dataset_demo_users_dataset_users
+  dataset_demo_users_dataset_users --- dataset_demo_users_dataset_users_created_at
+  dataset_demo_users_dataset_users --- dataset_demo_users_dataset_users_email
+  dataset_demo_users_dataset_users --- dataset_demo_users_dataset_users_first_name
+  dataset_demo_users_dataset_users --- dataset_demo_users_dataset_users_food_preference
+  dataset_demo_users_dataset_users --- dataset_demo_users_dataset_users_state
+  dataset_demo_users_dataset_users --- dataset_demo_users_dataset_users_uuid
+  dataset_demo_users_dataset -->|"ingress"| system_demo_analytics_system
+  system_demo_analytics_system -.->|"user.contact, user.device.cookie_id"| use_improve_system
+  system_demo_marketing_system -.->|"user.cookie_id"| use_advertising

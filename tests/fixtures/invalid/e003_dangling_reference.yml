@@ -1,0 +1,13 @@
+system:
+  - fides_key: dangling_refs
+    system_type: Service
+    dataset_references: [no_such_dataset]
+    ingress:
+      - fides_key: no_such_system
+        type: system
+    privacy_declarations:
+      - name: ok
+        data_use: analytics
+        data_categories: [user.name]
+        data_subjects: [customer]
+        egress: [nowhere]

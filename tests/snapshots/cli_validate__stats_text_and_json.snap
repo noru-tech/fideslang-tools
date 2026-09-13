@@ -1,0 +1,36 @@
+---
+source: tests/cli_validate.rs
+expression: out
+---
+resources  5 files
+type          count
+data_subject  1
+data_use      1
+dataset       1
+organization  1
+policy        1
+system        2
+
+datasets
+  1 datasets, 1 collections, 6 fields, 5 categorized (83%)
+  1 uncategorized:
+    demo_users_dataset.users.food_preference
+
+systems
+  2 systems, 2 privacy declarations, 1 datasets referenced
+
+categories used  8 distinct
+key                 uses
+user.contact        2
+system.operations   1
+user.contact.email  1
+  … 5 more (--top N)
+
+uses used  2 distinct
+key             uses
+advertising     2
+improve.system  1
+
+subjects used  1 distinct
+key       uses
+customer  3

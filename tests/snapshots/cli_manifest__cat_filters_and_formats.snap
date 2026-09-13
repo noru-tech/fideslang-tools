@@ -1,0 +1,41 @@
+---
+source: tests/cli_manifest.rs
+expression: tree
+---
+organization (1)
+└── default_organization  Demo Organization
+data_use (1)
+└── third_party_sharing.personalized_advertising.direct_marketing  Direct Marketing
+    └── parent: third_party_sharing.personalized_advertising
+data_subject (1)
+└── potential_customer  Potential Customer
+dataset (1)
+└── demo_users_dataset  Demo Users Dataset
+    └── users
+        ├── created_at  system.operations
+        ├── email  user.contact.email
+        ├── first_name  user.name
+        ├── food_preference  (uncategorized)
+        ├── state  user.contact.state
+        └── uuid  user.unique_id
+system (2)
+├── demo_analytics_system  Demo Analytics System
+│   ├── type: Service
+│   ├── ← ingress demo_users_dataset
+│   └── Analyze customer behaviour for improvements.
+│       ├── use: improve.system
+│       ├── categories: user.contact, user.device.cookie_id
+│       ├── subjects: customer
+│       └── ingress: demo_users_dataset
+└── demo_marketing_system  Demo Marketing System
+    ├── type: Service
+    └── Collect data for marketing
+        ├── use: advertising
+        ├── categories: user.cookie_id
+        └── subjects: customer
+policy (1)
+└── demo_privacy_policy  Demo Privacy Policy
+    └── Reject Direct Marketing
+        ├── data_categories ANY user.contact
+        ├── data_uses ANY advertising
+        └── data_subjects ANY customer

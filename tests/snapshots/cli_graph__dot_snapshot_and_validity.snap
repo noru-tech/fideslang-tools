@@ -1,0 +1,26 @@
+---
+source: tests/cli_graph.rs
+expression: dot
+---
+digraph "fides manifest" {
+  rankdir=LR;
+  node [fontname="Helvetica,Arial,sans-serif", fontsize=10];
+  edge [fontname="Helvetica,Arial,sans-serif", fontsize=8, color="#64748b"];
+  dataset_demo_users_dataset [label="demo_users_dataset\nDemo Users Dataset", shape=cylinder, style=filled, fillcolor="#dcfce7"];
+  system_demo_analytics_system [label="demo_analytics_system\nDemo Analytics System", shape=box, style="rounded,filled", fillcolor="#dbeafe"];
+  use_improve_system [label="improve.system", shape=ellipse, style=filled, fillcolor="#fef9c3"];
+  cat_user_contact [label="user.contact", shape=box, style="rounded,filled", fillcolor="#cffafe"];
+  cat_user_device_cookie_id [label="user.device.cookie_id", shape=box, style="rounded,filled", fillcolor="#cffafe"];
+  subj_customer [label="customer", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  system_demo_marketing_system [label="demo_marketing_system\nDemo Marketing System", shape=box, style="rounded,filled", fillcolor="#dbeafe"];
+  use_advertising [label="advertising", shape=ellipse, style=filled, fillcolor="#fef9c3"];
+  cat_user_cookie_id [label="user.cookie_id", shape=box, style="rounded,filled", fillcolor="#cffafe"];
+  dataset_demo_users_dataset -> system_demo_analytics_system [penwidth=1.5, label="ingress"];
+  system_demo_analytics_system -> use_improve_system [style=dotted, color="#a16207", label="user.contact, user.device.cookie_id"];
+  system_demo_analytics_system -> cat_user_contact [style=dotted, color="#0e7490"];
+  system_demo_analytics_system -> cat_user_device_cookie_id [style=dotted, color="#0e7490"];
+  system_demo_analytics_system -> subj_customer [style=dotted, color="#4338ca"];
+  system_demo_marketing_system -> use_advertising [style=dotted, color="#a16207", label="user.cookie_id"];
+  system_demo_marketing_system -> cat_user_cookie_id [style=dotted, color="#0e7490"];
+  system_demo_marketing_system -> subj_customer [style=dotted, color="#4338ca"];
+}

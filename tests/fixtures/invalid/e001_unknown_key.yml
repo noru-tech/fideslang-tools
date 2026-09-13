@@ -1,0 +1,8 @@
+system:
+  - fides_key: bad_keys_system
+    system_type: Service
+    privacy_declarations:
+      - name: uses keys that do not exist
+        data_use: marketing.advertisin
+        data_categories: [user.contact.emial]
+        data_subjects: [custommer]

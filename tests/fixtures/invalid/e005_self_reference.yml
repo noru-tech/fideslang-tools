@@ -1,0 +1,4 @@
+data_category:
+  - fides_key: user.loop
+    name: Self parent
+    parent_key: user.loop

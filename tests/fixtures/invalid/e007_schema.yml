@@ -1,0 +1,10 @@
+system:
+  - fides_key: missing_type
+    privacy_declarations:
+      - name: no data_use
+        data_categories: user.name
+        data_subjects: [customer]
+dataset:
+  - fides_key: no_collections
+widget:
+  - fides_key: unknown_type

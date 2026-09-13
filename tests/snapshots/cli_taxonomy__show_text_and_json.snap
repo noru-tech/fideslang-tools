@@ -1,0 +1,8 @@
+---
+source: tests/cli_taxonomy.rs
+expression: out
+---
+user.contact.email  —  User Contact Email  [data_category · ethyca 3.1.4 · added 2.0.0]
+  User's contact email address.
+ancestors:   user › user.contact › user.contact.email
+children:    (none)

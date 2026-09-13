@@ -1,0 +1,4 @@
+system:
+  - fides_key: "has spaces/and slashes"
+    system_type: Service
+    privacy_declarations: []

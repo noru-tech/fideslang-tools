@@ -1,0 +1,24 @@
+---
+source: tests/cli_taxonomy.rs
+expression: dot
+---
+digraph "fideslang ethyca 3.1.4" {
+  rankdir=LR;
+  node [fontname="Helvetica,Arial,sans-serif", fontsize=10];
+  edge [fontname="Helvetica,Arial,sans-serif", fontsize=8, color="#64748b"];
+  anonymous_user [label="anonymous_user\nAnonymous User", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  citizen_voter [label="citizen_voter\nCitizen Voter", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  commuter [label="commuter\nCommuter", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  consultant [label="consultant\nConsultant", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  customer [label="customer\nCustomer", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  employee [label="employee\nEmployee", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  job_applicant [label="job_applicant\nJob Applicant", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  next_of_kin [label="next_of_kin\nNext of Kin", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  passenger [label="passenger\nPassenger", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  patient [label="patient\nPatient", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  prospect [label="prospect\nProspect", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  shareholder [label="shareholder\nShareholder", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  supplier_vendor [label="supplier_vendor\nSupplier/Vendor", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  trainee [label="trainee\nTrainee", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+  visitor [label="visitor\nVisitor", shape=hexagon, style=filled, fillcolor="#e0e7ff"];
+}

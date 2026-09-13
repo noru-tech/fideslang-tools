@@ -1,0 +1,5 @@
+system:
+  - fides_key: extra_fields
+    system_type: Service
+    made_up_field: true
+    privacy_declarations: []

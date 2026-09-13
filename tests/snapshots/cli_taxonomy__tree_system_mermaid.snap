@@ -1,0 +1,21 @@
+---
+source: tests/cli_taxonomy.rs
+expression: mmd
+---
+flowchart LR
+  %% fideslang ethyca 3.1.4
+  classDef system fill:#dbeafe,stroke:#1d4ed8
+  classDef dataset fill:#dcfce7,stroke:#15803d
+  classDef collection fill:#f0fdf4,stroke:#15803d
+  classDef field fill:#ffffff,stroke:#94a3b8
+  classDef organization fill:#f3e8ff,stroke:#7e22ce
+  classDef policy fill:#fee2e2,stroke:#b91c1c
+  classDef category fill:#cffafe,stroke:#0e7490
+  classDef use fill:#fef9c3,stroke:#a16207
+  classDef subject fill:#e0e7ff,stroke:#4338ca
+  classDef external fill:#f8fafc,stroke:#64748b,stroke-dasharray: 4 2
+  system(["system<br/>System Data"]):::category
+  system_authentication(["system.authentication<br/>Authentication Data"]):::category
+  system_operations(["system.operations<br/>Operations Data"]):::category
+  system --- system_authentication
+  system --- system_operations

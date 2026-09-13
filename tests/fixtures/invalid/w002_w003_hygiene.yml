@@ -1,0 +1,16 @@
+dataset:
+  - fides_key: sparse
+    collections:
+      - name: t
+        fields:
+          - name: untagged
+          - name: tagged
+            data_categories: [user.name]
+system:
+  - fides_key: empty_declaration
+    system_type: Service
+    privacy_declarations:
+      - name: nothing declared
+        data_use: analytics
+        data_categories: []
+        data_subjects: []

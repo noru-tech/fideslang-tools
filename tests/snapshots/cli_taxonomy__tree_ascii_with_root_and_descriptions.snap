@@ -1,0 +1,12 @@
+---
+source: tests/cli_taxonomy.rs
+expression: out
+---
+data_use (ethyca 3.1.4)
+`-- analytics  Analytics  — Provides analytics for activities such as system and advertising performance reporting, insights and fraud detection.
+    `-- reporting  Analytics for Reporting  — Provides analytics for general reporting such as system and advertising performance.
+        |-- ad_performance  Analytics for Advertising Performance  — Provides analytics for reporting of advertising performance.
+        |-- campaign_insights  Analytics for Insights  — Provides analytics for reporting of campaign insights related to advertising and promotion activities.
+        |-- content_performance  Analytics for Content Performance  — Analytics for reporting on content performance.
+        `-- system  Analytics for System Activity  — Provides analytics for reporting on system activity.
+            `-- performance  Analytics for System Performance  — Provides analytics for reporting on system performance.

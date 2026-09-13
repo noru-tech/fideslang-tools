@@ -1,0 +1,8 @@
+dataset:
+  - fides_key: legacy_purposes
+    data_purposes: [analytics]
+    collections:
+      - name: t
+        fields:
+          - name: f
+            data_categories: [user.name]

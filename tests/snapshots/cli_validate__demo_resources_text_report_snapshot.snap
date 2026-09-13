@@ -1,0 +1,19 @@
+---
+source: tests/cli_validate.rs
+expression: out
+---
+<demo>/demo_dataset.yml  dataset[demo_users_dataset].collections[0].fields[3].data_categories
+  W002 field `food_preference` has no data_categories
+<demo>/demo_dataset.yml  dataset[demo_users_dataset].collections[0].fields[4].data_categories[0]
+  E001 unknown data category `user.contact.state` — did you mean `user.contact.address.state`, `user.contact.address`, `user.contact.email`?
+<demo>/demo_extended_taxonomy.yml  data_use[third_party_sharing.personalized_advertising.direct_marketing].parent_key
+  E001 unknown data use `third_party_sharing.personalized_advertising` — did you mean `third_party_sharing.personalized_advertising.direct_marketing`, `third_party_sharing.legal_obligation`, `third_party_sharing`?
+<demo>/demo_policy.yml  policy[demo_privacy_policy].rules[0].data_uses.values[0]
+  E001 unknown data use `advertising` — did you mean `marketing.advertising`?
+<demo>/demo_system.yml  system[demo_analytics_system].privacy_declarations[0].data_use
+  E001 unknown data use `improve.system` — did you mean `analytics.reporting.system`, `personalize.system`?
+<demo>/demo_system.yml  system[demo_marketing_system].privacy_declarations[0].data_categories[0]
+  E001 unknown data category `user.cookie_id` — did you mean `user.device.cookie_id`, `user.device.cookie`, `user.unique_id`?
+<demo>/demo_system.yml  system[demo_marketing_system].privacy_declarations[0].data_use
+  E001 unknown data use `advertising` — did you mean `marketing.advertising`?
+5 files, 7 resources checked against ethyca 3.1.4: 6 errors, 1 warning

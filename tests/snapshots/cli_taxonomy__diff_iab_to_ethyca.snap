@@ -1,0 +1,10 @@
+---
+source: tests/cli_taxonomy.rs
+expression: out
+---
+iab 3.0.0 → ethyca 3.1.4
+data_category: no changes (85)
+data_use: 55 → 56
+  + functional.storage.privacy_preferences  Local Data Storage for Privacy Preferences  (parent functional.storage)
+data_subject: no changes (15)
+1 added, 0 removed, 0 changed
