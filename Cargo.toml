@@ -1,6 +1,6 @@
 [package]
 name = "fideslang-cli"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.89"
 description = "fl — a command-line toolbox for Fideslang privacy taxonomies and Fides manifests: browse, visualize, convert, merge, validate"
