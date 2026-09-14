@@ -1,7 +1,7 @@
 //! `fl split` — one file per resource type, or per resource.
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Component, Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use clap::{Args as ClapArgs, ValueEnum};
@@ -40,6 +40,21 @@ pub struct Args {
     pub force: bool,
 }
 
+/// Resource types and `fides_key`s come straight out of the manifest, so before they become a
+/// file or directory name make sure each one is a single plain path component: no separators,
+/// no `.`/`..`, no NUL, not empty. Otherwise a crafted manifest could write outside `--out-dir`.
+fn plain_file_name<'a>(what: &str, s: &'a str) -> Result<&'a str> {
+    let mut parts = Path::new(s).components();
+    let single =
+        matches!(parts.next(), Some(Component::Normal(c)) if c == s) && parts.next().is_none();
+    if !single || s.contains(['\\', '\0']) {
+        bail!(
+            "{what} `{s}` is not a plain file name (path separators, `.` and `..` are not allowed)"
+        );
+    }
+    Ok(s)
+}
+
 pub fn run(ctx: &mut Ctx, a: Args) -> Result<Exit> {
     if a.format == Format::Csv {
         bail!("split writes manifests; use --format yaml or json (convert can produce CSV)");
@@ -63,6 +78,7 @@ pub fn run(ctx: &mut Ctx, a: Args) -> Result<Exit> {
     match a.by {
         By::Type => {
             for (t, doc) in m.split_by_type() {
+                let t = plain_file_name("resource type", &t)?;
                 write(
                     a.out_dir.join(format!("{t}.{}", a.format.extension())),
                     &doc,
@@ -75,11 +91,15 @@ pub fn run(ctx: &mut Ctx, a: Args) -> Result<Exit> {
                     .fides_key()
                     .map(str::to_string)
                     .unwrap_or_else(|| format!("item-{}", r.index));
+                let rtype = plain_file_name("resource type", &r.resource_type)
+                    .with_context(|| format!("cannot split {}", r.locator()))?;
+                let name = plain_file_name("fides_key", &name)
+                    .with_context(|| format!("cannot split {}", r.locator()))?;
                 let mut doc = Map::new();
                 doc.insert(r.resource_type.clone(), Value::Array(vec![r.value.clone()]));
                 write(
                     a.out_dir
-                        .join(&r.resource_type)
+                        .join(rtype)
                         .join(format!("{name}.{}", a.format.extension())),
                     &Value::Object(doc),
                 )?;

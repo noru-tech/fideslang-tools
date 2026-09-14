@@ -255,3 +255,33 @@ fn default_path_is_dot_fides() {
         .success()
         .stdout(predicate::str::contains("\"here\""));
 }
+
+#[test]
+fn split_refuses_path_traversal_in_manifest_values() {
+    let dir = tempfile::tempdir().unwrap();
+    let out = dir.path().join("out");
+    let manifest = dir.path().join("manifest.yml");
+    fs::write(
+        &manifest,
+        "dataset:\n- fides_key: ../../escaped\n  name: Escaped\n\"../evil\":\n- fides_key: x\n",
+    )
+    .unwrap();
+
+    fl().args(["split", "--by", "resource", "--out-dir"])
+        .arg(&out)
+        .arg(&manifest)
+        .assert()
+        .code(2)
+        .stderr(predicate::str::contains("not a plain file name"));
+    fl().args(["split", "--by", "type", "--out-dir"])
+        .arg(&out)
+        .arg(&manifest)
+        .assert()
+        .code(2)
+        .stderr(predicate::str::contains("not a plain file name"));
+
+    // `out/dataset/../../escaped.yml` and `out/../evil/x.yml` resolve to these.
+    assert!(!dir.path().join("escaped.yml").exists());
+    assert!(!dir.path().join("evil").exists());
+    assert!(!dir.path().join("evil.yml").exists());
+}

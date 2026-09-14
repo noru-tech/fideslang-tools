@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Security
+- `fl split` now refuses resource types and `fides_key`s that are not plain file names (path
+  separators, `.`, `..`), so a crafted manifest can no longer write files outside `--out-dir`.
+
 ## [0.1.0] - 2026-09-13
 
 ### Added
