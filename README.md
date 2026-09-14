@@ -1,5 +1,9 @@
 # fideslang-tools
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/noru-tech/fideslang-tools/main/assets/fideslang-tools.png" alt="fideslang-tools" width="720">
+</p>
+
 > `fl` — a fast, offline command-line toolbox for [Fideslang](https://github.com/IABTechLab/fideslang)
 > privacy taxonomy and Fideslang manifests: browse, search and draw
 > the taxonomy; cat, convert, merge, split, validate, summarize and graph your data maps.
