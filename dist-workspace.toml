@@ -1,7 +1,7 @@
 [workspace]
 members = ["cargo:."]
 
-# Config for 'dist' (cargo-dist). Regenerate CI with `dist generate`; never hand-edit release.yml.
+# Config for 'dist' (cargo-dist). Regenerate CI with `dist generate`, then re-pin its actions to commit hashes.
 [dist]
 # The preferred dist version to use in CI (Cargo.toml SemVer syntax)
 cargo-dist-version = "0.33.0"
@@ -31,6 +31,8 @@ publish-jobs = ["homebrew"]
 github-attestations = true
 # On pull requests only run `dist plan`, never a full build
 pr-run-mode = "plan"
+# release.yml pins third-party actions to commit hashes by hand; keep dist from rejecting that
+allow-dirty = ["ci"]
 
 [dist.github-custom-runners]
 aarch64-unknown-linux-musl = "ubuntu-24.04-arm"
