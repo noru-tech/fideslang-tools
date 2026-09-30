@@ -1,0 +1,8 @@
+# Review ownership. The bundled taxonomy snapshot carries compatibility commitments; workflows run
+# with repository credentials and publish releases.
+*                       @bipthelin
+/taxonomy/              @bipthelin
+/src/validate/          @bipthelin
+/.github/               @bipthelin
+/dist-workspace.toml    @bipthelin
+/Cargo.toml             @bipthelin
