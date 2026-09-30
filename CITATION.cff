@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: If you use fl in research or documentation, please cite it as below.
+title: "fideslang-tools: Rust CLI for Fideslang privacy taxonomies and Fides manifests"
+abstract: >-
+  Rust CLI for Fideslang privacy taxonomies and Fides manifests. Browse, validate, merge, convert
+  and graph data maps offline.
+type: software
+authors:
+  - name: Noru
+    website: https://noru.tech
+repository-code: https://github.com/noru-tech/fideslang-tools
+url: https://github.com/noru-tech/fideslang-tools
+license: MIT
+version: "0.1.1"
+date-released: "2026-09-14"
+keywords:
+  - fideslang
+  - fides
+  - privacy
+  - data map
+  - privacy taxonomy
+references:
+  - type: software
+    title: "Fideslang: IAB Tech Lab Privacy Taxonomy"
+    authors:
+      - name: IAB Tech Lab
+      - name: Ethyca, Inc.
+    repository-code: https://github.com/IABTechLab/fideslang
+    version: "3.0.0"
+    license: CC-BY-4.0

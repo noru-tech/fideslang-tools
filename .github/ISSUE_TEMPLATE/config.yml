@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/noru-tech/fideslang-tools/security/advisories/new
+    about: Report privately; see SECURITY.md. Do not open a public issue for an unfixed vulnerability.
+  - name: Taxonomy content (categories, uses, subjects)
+    url: https://github.com/IABTechLab/fideslang/issues
+    about: The vocabulary itself is maintained upstream by IAB Tech Lab. fl bundles a snapshot of it.

@@ -1,0 +1,51 @@
+name: Bug report
+description: Wrong validation result, bad conversion or output, crash, or a manifest fl cannot read
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        A Fides data map describes where personal data lives. Please attach a **synthetic**
+        reproduction (see `tests/fixtures/`) or pseudonymize system and dataset names before pasting.
+  - type: input
+    id: version
+    attributes:
+      label: fl version
+      placeholder: fl --version
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: Installed via
+      options: [Homebrew, release archive, built from source, other]
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [taxonomy browsing, validate, cat / convert / merge / split, graph, stats, completions / manpage, other]
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: For a validation rule, name the code (E0xx / W0xx) and what upstream Fideslang says.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened?
+      description: Command, exit code and output.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: A minimal manifest (synthetic names) that shows the problem, if you can.
+      render: yaml

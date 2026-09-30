@@ -14,7 +14,9 @@ Please report security issues **privately** — do not open a public issue for a
 vulnerability.
 
 - Email: **security@noru.tech** with a subject line beginning `[SECURITY] fideslang-tools`.
-- Or use GitHub **Private vulnerability reporting** (Security → *Report a vulnerability*).
+- Or use GitHub **private vulnerability reporting**:
+  <https://github.com/noru-tech/fideslang-tools/security/advisories/new> (Security → *Report a
+  vulnerability*).
 
 Please include: a description of the issue, the affected version or commit, reproduction steps or a
 proof of concept, and the impact you foresee.
@@ -31,7 +33,7 @@ triage. We will credit reporters who wish to be named once a fix is released.
   `--out-dir`).
 - Release binaries are built by GitHub Actions from tagged commits, published with SHA-256 checksums
   and GitHub artifact attestations. Verify with
-  `gh attestation verify <archive> --repo noru-tech/fideslang-tools`.
+  `gh attestation verify <archive> --repo noru-tech/fideslang-tools --signer-workflow noru-tech/fideslang-tools/.github/workflows/release.yml`.
 
 Out of scope: the semantic accuracy of the upstream Fideslang taxonomy, and vulnerabilities in
 upstream Fideslang or Fides.

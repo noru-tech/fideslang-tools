@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a new command, output format, validation rule or option
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        fl stays offline and self-contained: no network calls at runtime and a pure-Rust
+        dependency tree. Proposals that need a server or a network connection are out of scope.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do with your taxonomy or manifests, and what gets in the way today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+      description: The command line you would type and the output you would expect. For a validation rule, the exact condition and its severity.
+    validations:
+      required: true
+  - type: textarea
+    id: upstream
+    attributes:
+      label: Upstream reference
+      description: Where Fideslang or Fides defines the behaviour, if it does (link to the model, docs or CLI).
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
