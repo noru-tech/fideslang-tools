@@ -17,8 +17,8 @@ All notable changes to this project are documented here. The format is based on
 - README restructured: install (Homebrew, release archives), how to verify an archive with
   `gh attestation verify` and its SHA-256 file, a zero-config quick start, limitations, output
   formats and exit codes, citation and trust sections.
-- README no longer advertises `cargo install` / `cargo binstall` (the crate is not on crates.io
-  yet) or the `curl | sh` installer. Homebrew and the release archives are the supported install paths.
+- The crate is published on crates.io as `fideslang-cli`: README shows its badge and the
+  `cargo binstall` / `cargo install` lines. It no longer advertises the `curl | sh` installer.
 - Crate description and categories updated (`parser-implementations` replaces `data-structures`).
 - `release.yml` grants `contents: write` only to the jobs that create and upload the release.
 - `SECURITY.md` links GitHub private vulnerability reporting directly.

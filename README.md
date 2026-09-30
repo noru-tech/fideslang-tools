@@ -14,6 +14,7 @@ split, validate, summarize and graph your data maps.
 [![ci](https://github.com/noru-tech/fideslang-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/noru-tech/fideslang-tools/actions/workflows/ci.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/noru-tech/fideslang-tools/badge)](https://scorecard.dev/viewer/?uri=github.com/noru-tech/fideslang-tools)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![crates.io](https://img.shields.io/crates/v/fideslang-cli.svg)](https://crates.io/crates/fideslang-cli)
 
 The [IAB Tech Lab Privacy Taxonomy](https://github.com/IABTechLab/fideslang) (Fideslang) is the
 industry-standard vocabulary for describing personal data and how it is processed: hierarchical
@@ -42,19 +43,15 @@ Prebuilt binaries for macOS (Apple Silicon, Intel) and Linux (x86_64, aarch64, f
 brew install noru-tech/tap/fl
 ```
 
-<!--
-crates.io: fideslang-cli is not published yet. Restore these lines (and the crates.io badge,
-https://img.shields.io/crates/v/fideslang-cli.svg linking to https://crates.io/crates/fideslang-cli)
-once the first release is on crates.io. Always use the full crate name: the crate `fl` on crates.io
-is an unrelated tool.
-
 ### From crates.io
 
+The crate is `fideslang-cli` (the crate `fl` on crates.io is an unrelated tool). The binary it
+installs is `fl`.
+
 ```bash
-cargo install --locked fideslang-cli      # builds from source, needs a Rust toolchain
 cargo binstall fideslang-cli              # downloads the prebuilt release binary
+cargo install --locked fideslang-cli      # builds from source, needs a Rust toolchain
 ```
--->
 
 ### Prebuilt binaries
 
