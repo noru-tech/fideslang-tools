@@ -11,8 +11,8 @@ authors:
 repository-code: https://github.com/noru-tech/fideslang-tools
 url: https://github.com/noru-tech/fideslang-tools
 license: MIT
-version: "0.1.1"
-date-released: "2026-09-14"
+version: "0.1.2"
+date-released: "2026-09-30"
 keywords:
   - fideslang
   - fides
