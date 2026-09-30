@@ -3,14 +3,14 @@ name = "fideslang-cli"
 version = "0.1.1"
 edition = "2024"
 rust-version = "1.89"
-description = "fl — a command-line toolbox for Fideslang privacy taxonomies and Fides manifests: browse, visualize, convert, merge, validate"
+description = "Rust CLI for Fideslang privacy taxonomies and Fides manifests. Browse, validate, merge, convert and graph data maps offline."
 license = "MIT"
 repository = "https://github.com/noru-tech/fideslang-tools"
 homepage = "https://github.com/noru-tech/fideslang-tools"
 documentation = "https://github.com/noru-tech/fideslang-tools#readme"
 readme = "README.md"
 keywords = ["fideslang", "fides", "privacy", "taxonomy", "cli"]
-categories = ["command-line-utilities", "data-structures"]
+categories = ["command-line-utilities", "parser-implementations"]
 authors = ["Noru <bip@noru.tech>"]
 include = [
   "src/**",
