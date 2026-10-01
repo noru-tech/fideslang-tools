@@ -135,6 +135,9 @@ jobs:
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
             echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           fi
+      - name: "Generate shell completions and man pages"
+        run: "scripts/release-assets.sh target/release-assets"
+        shell: "bash"
       - name: Install dist
         run: ${{ matrix.install_dist.run }}
       # Get the dist-manifest
@@ -335,6 +338,17 @@ jobs:
           pattern: artifacts-*
           path: Formula/
           merge-multiple: true
+      # Hand edit (re-apply after `dist generate`): dist's formula template cannot install shell
+      # completions or man pages, so patch the formula to install the ones in the archive.
+      - name: Fetch the formula patch script
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fideslang-tools
+          sparse-checkout: scripts/homebrew-formula-extras.sh
+          sparse-checkout-cone-mode: false
+      - name: Install completions and man pages from the formula
+        run: fideslang-tools/scripts/homebrew-formula-extras.sh Formula/fl.rb
       # This is extra complex because you can make your Formula name not match your app name
       # so we need to find releases with a *.rb file, and publish with that filename.
       - name: Commit formula files

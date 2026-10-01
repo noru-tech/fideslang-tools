@@ -45,6 +45,9 @@ every release.
 brew install noru-tech/tap/fl
 ```
 
+From the first release after 0.1.3, the formula also installs bash, zsh and fish completions and
+the man pages (`man fl`, `man fl-validate`, …).
+
 ### From crates.io
 
 The crate is `fideslang-cli` (the crate `fl` on crates.io is an unrelated tool). The binary it
@@ -67,7 +70,11 @@ Download the archive for your platform from the
 | Linux, x86_64 (static musl) | `fideslang-cli-x86_64-unknown-linux-musl.tar.xz` |
 | Linux, aarch64 (static musl) | `fideslang-cli-aarch64-unknown-linux-musl.tar.xz` |
 
-Each archive unpacks to `fideslang-cli-<target>/fl`; put `fl` anywhere on your `PATH`. A tarball
+Each archive unpacks to `fideslang-cli-<target>/fl`; put `fl` anywhere on your `PATH`. From the
+first release after 0.1.3 the archive also holds `NOTICE` (taxonomy attribution), `completions/`
+(`fl.bash`, `_fl` for zsh, `fl.fish`) and `man/` (`fl.1` and one page per subcommand); copy the
+completions to your shell's completion directory and the pages to a `man1` directory on your
+`MANPATH`. A tarball
 downloaded with a browser on macOS is quarantined by Gatekeeper; `xattr -d com.apple.quarantine fl`
 clears it.
 
@@ -95,7 +102,8 @@ shasum -a 256 -c "fideslang-cli-$TARGET.tar.xz.sha256"    # or: sha256sum -c
 tar xJf "fideslang-cli-$TARGET.tar.xz"
 ```
 
-Shell completions and man pages: `fl completions zsh|bash|fish|…` and `fl manpage --out-dir DIR`.
+Shell completions and man pages for any install method: `fl completions zsh|bash|fish|…` and
+`fl manpage --out-dir DIR`.
 
 ## Quick start
 
