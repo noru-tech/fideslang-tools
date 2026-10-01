@@ -7,8 +7,25 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- `docs/rules/`: one page per validation code (E001–E007, W001–W005) with the rule, why it matters,
+  the controls it relates to, a failing and a passing example with real `fl validate` output, how to
+  fix it and how to promote or silence it, plus an index. The README rules table links each code.
+- `docs/exit-codes.md`: what exit codes 0, 1 and 2 mean and which commands return them.
+- `llms.txt` at the repository root (llms.txt convention): summary, install commands and links to
+  the key pages.
+- `docs/openssf-best-practices.md`: prepared answers for the OpenSSF Best Practices "passing"
+  criteria, with evidence links.
+- Test fixtures: `tests/fixtures/invalid/w001_deprecated_key.yml` (W001 had none) and a corrected,
+  clean copy of every failing fixture under `tests/fixtures/valid/`. `cargo test` checks that the
+  passing fixtures stay clean and that every code has a documentation page linked from the README.
 - `codeql.yml`: CodeQL static analysis of the Rust, Python and workflow code on every pull request,
   on main and weekly; results go to code scanning.
+
+### Changed
+- README: several headings are now the questions people ask ("How do I install fl?", "How do I
+  validate a Fides manifest offline?", "How do I draw a data map from Fides manifests?", "How do I
+  cite fl?"), each answered in its first sentence. The E003 row now lists `organization_fides_key`.
+- CONTRIBUTING and the pull request template: a new rule needs a passing fixture and a docs page.
 
 ## [0.1.3] - 2026-10-01
 
