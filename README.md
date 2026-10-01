@@ -211,7 +211,7 @@ they predate Fideslang 3.0 and deliberately fail validation, which makes them a 
 | Area | Commands |
 | --- | --- |
 | Browse the taxonomy | `fl taxonomy list`, `tree`, `show`, `search`, `cat`, `info` |
-| Check a data map | `fl validate` (stable E0xx/W0xx codes, "did you mean" suggestions, GitHub annotations) |
+| Check a data map | `fl validate` ([stable E0xx/W0xx codes](docs/rules/README.md), "did you mean" suggestions, GitHub annotations) |
 | Transform manifests | `fl cat`, `fl convert` (YAML, JSON, CSV), `fl merge`, `fl split` |
 | Understand a data map | `fl graph` (DOT, Mermaid, JSON), `fl stats`, `fl taxonomy diff` |
 | Shell integration | `fl completions <shell>`, `fl manpage` |
@@ -264,28 +264,31 @@ need no files and no network. Manifest commands load every input file, union the
 (like upstream's `ingest_manifests`), apply `--type` / `--key` filters, and then print, transform,
 graph or validate the result.
 
-`fl validate` runs these rules:
+### Validation rules
+
+`fl validate` runs these rules. Each code has a page with a failing and a passing example and how to
+fix it; the index is [docs/rules](docs/rules/README.md).
 
 | Code | Severity | Check |
 | --- | --- | --- |
-| E001 | error | Unknown data category / use / subject key (with "did you mean" suggestions) |
-| E002 | error | Duplicate `fides_key` within a resource type, across all loaded files |
-| E003 | error | Dangling reference: `dataset_references`, `ingress`/`egress`, `fides_meta.references`, `after`/`erase_after` |
-| E004 | error | Custom taxonomy `parent_key` missing or not the dotted prefix of the key |
-| E005 | error | Custom taxonomy record references itself |
-| E006 | error | Invalid `fides_key` syntax (letters, digits, `.`, `_`, `<`, `>`, `-`) |
-| E007 | error | Structure: missing required fields, wrong types, unknown resource type |
-| W001 | warning | Deprecated key (suggests `replaced_by`) |
-| W002 | warning | Dataset field with no `data_categories` |
-| W003 | warning | Privacy declaration with no categories or no subjects |
-| W004 | warning | `data_purposes`, the deprecated alias of `data_uses` |
-| W005 | warning | Field not defined by the upstream models (only with `--strict`) |
+| [E001](docs/rules/E001.md) | error | Unknown data category / use / subject key (with "did you mean" suggestions) |
+| [E002](docs/rules/E002.md) | error | Duplicate `fides_key` within a resource type, across all loaded files |
+| [E003](docs/rules/E003.md) | error | Dangling reference: `dataset_references`, `ingress`/`egress`, `fides_meta.references`, `after`/`erase_after`, `organization_fides_key` |
+| [E004](docs/rules/E004.md) | error | Custom taxonomy `parent_key` missing or not the dotted prefix of the key |
+| [E005](docs/rules/E005.md) | error | Custom taxonomy record references itself |
+| [E006](docs/rules/E006.md) | error | Invalid `fides_key` syntax (letters, digits, `.`, `_`, `<`, `>`, `-`) |
+| [E007](docs/rules/E007.md) | error | Structure: missing required fields, wrong types, unknown resource type |
+| [W001](docs/rules/W001.md) | warning | Deprecated key (suggests `replaced_by`) |
+| [W002](docs/rules/W002.md) | warning | Dataset field with no `data_categories` |
+| [W003](docs/rules/W003.md) | warning | Privacy declaration with no categories or no subjects |
+| [W004](docs/rules/W004.md) | warning | `data_purposes`, the deprecated alias of `data_uses` |
+| [W005](docs/rules/W005.md) | warning | Field not defined by the upstream models (only with `--strict`) |
 
 Custom `data_category` / `data_use` / `data_subject` resources declared in the manifest set extend
 the taxonomy for E001 (disable with `--no-custom-taxonomy`). `--deny CODE` promotes a code to an
 error, `--allow CODE` silences it, `-W` treats every warning as an error.
 
-To build from source:
+### Building from source
 
 ```bash
 cargo build
@@ -314,7 +317,7 @@ Manifest commands read YAML, JSON or CSV, detected from the file extension (YAML
 `--from yaml|json|csv` overrides detection. Global flags: `--color auto|always|never` (also `FL_COLOR`; honors `NO_COLOR`), `-o FILE`,
 `-q` (suppress the summary lines on stderr).
 
-Exit codes:
+Exit codes (details in [docs/exit-codes.md](docs/exit-codes.md)):
 
 | Code | Meaning |
 | --- | --- |

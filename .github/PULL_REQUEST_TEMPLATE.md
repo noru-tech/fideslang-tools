@@ -15,7 +15,7 @@ or refresh the taxonomy snapshot.
 
 - [ ] `cargo fmt --all && cargo clippy --all-targets --all-features -- -D warnings && cargo test`
 - [ ] Output changes: snapshots reviewed with `cargo insta review`
-- [ ] New or changed validation rule: stable code, fixture under `tests/fixtures/invalid/`, README table updated
+- [ ] New or changed validation rule: stable code, failing fixture under `tests/fixtures/invalid/` and passing one under `tests/fixtures/valid/`, `docs/rules/<CODE>.md` page, README table updated
 - [ ] Taxonomy refresh: generated with `scripts/refresh-taxonomy.sh`, `taxonomy/SOURCE.md` updated, removed keys called out
 - [ ] `CHANGELOG.md` updated under Unreleased for user-visible changes
 - [ ] No real manifests or personal data in the diff

@@ -1,0 +1,19 @@
+dataset:
+  - fides_key: orders_db
+    collections: []
+system:
+  - fides_key: upstream_system
+    system_type: Service
+    privacy_declarations: []
+  - fides_key: resolved_refs
+    system_type: Service
+    dataset_references: [orders_db]
+    ingress:
+      - fides_key: upstream_system
+        type: system
+    privacy_declarations:
+      - name: ok
+        data_use: analytics
+        data_categories: [user.name]
+        data_subjects: [customer]
+        egress: [user]

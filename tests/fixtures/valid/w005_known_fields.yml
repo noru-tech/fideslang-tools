@@ -1,0 +1,6 @@
+system:
+  - fides_key: meta_fields
+    system_type: Service
+    meta:
+      made_up_field: true
+    privacy_declarations: []

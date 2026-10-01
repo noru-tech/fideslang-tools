@@ -49,9 +49,71 @@ fn each_rule_fires_on_its_fixture() {
     assert!(e007.len() >= 4, "{e007:?}"); // missing system_type, data_use, categories not a list, no collections, unknown type
     let hygiene = codes("w002_w003_hygiene.yml", &[]);
     assert_eq!(hygiene, vec!["W002", "W003", "W003"]);
+    assert_eq!(codes("w001_deprecated_key.yml", &[]), vec!["W001"]);
     assert_eq!(codes("w004_data_purposes.yml", &[]), vec!["W004"]);
     assert_eq!(codes("w005_unknown_field.yml", &[]), Vec::<String>::new());
     assert_eq!(codes("w005_unknown_field.yml", &["--strict"]), vec!["W005"]);
+}
+
+/// The passing examples in `docs/rules/` come from `tests/fixtures/valid/`; keep them clean.
+#[test]
+fn valid_fixtures_are_clean() {
+    let dir = common::fixtures().join("valid");
+    let mut files: Vec<_> = std::fs::read_dir(&dir)
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .collect();
+    files.sort();
+    assert!(files.len() >= 11, "{files:?}");
+    for f in files {
+        let out = stdout(
+            fl().args(["-q", "validate", "--strict", "--format", "json"])
+                .arg(&f),
+        );
+        let v: serde_json::Value = serde_json::from_str(&out).unwrap();
+        assert_eq!(v["diagnostics"], serde_json::json!([]), "{}", f.display());
+        fl().args(["validate", "--strict"])
+            .arg(&f)
+            .assert()
+            .success();
+    }
+}
+
+/// Every code a rule can emit has a page under `docs/rules/`, listed in the index and linked from
+/// the README table.
+#[test]
+fn every_code_has_a_docs_page() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    let mut codes = std::collections::BTreeSet::new();
+    for entry in std::fs::read_dir(root.join("src/validate/rules")).unwrap() {
+        let src = std::fs::read_to_string(entry.unwrap().path()).unwrap();
+        for part in src.split('"').skip(1).step_by(2) {
+            let b = part.as_bytes();
+            if b.len() == 4
+                && (b[0] == b'E' || b[0] == b'W')
+                && b[1..].iter().all(u8::is_ascii_digit)
+            {
+                codes.insert(part.to_string());
+            }
+        }
+    }
+    assert!(codes.len() >= 12, "{codes:?}");
+    let index = std::fs::read_to_string(root.join("docs/rules/README.md")).unwrap();
+    let readme = std::fs::read_to_string(root.join("README.md")).unwrap();
+    for code in &codes {
+        assert!(
+            root.join(format!("docs/rules/{code}.md")).is_file(),
+            "missing docs/rules/{code}.md"
+        );
+        assert!(
+            index.contains(&format!("]({code}.md)")),
+            "{code} not in docs/rules/README.md"
+        );
+        assert!(
+            readme.contains(&format!("](docs/rules/{code}.md)")),
+            "{code} not linked from README.md"
+        );
+    }
 }
 
 #[test]

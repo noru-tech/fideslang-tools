@@ -50,7 +50,12 @@ snapshots. If you change output on purpose, review and accept the new snapshots 
 
 Adding a validation rule: add a file under `src/validate/rules/`, give it the next free stable code
 (`E0xx` for errors, `W0xx` for warnings), register it in `src/validate/mod.rs`, add a minimal failing
-fixture under `tests/fixtures/invalid/`, and document it in the README table.
+fixture under `tests/fixtures/invalid/` and its corrected copy under `tests/fixtures/valid/`, write
+`docs/rules/<CODE>.md` (copy an existing page: rule, why it matters, controls, failing and passing
+example with real `fl validate` output, how to fix, how to suppress), list it in
+`docs/rules/README.md`, and link it from the README table. `cargo test` fails if a code has no page
+or a passing fixture is not clean. A new warning also needs adding to the `-W` list in
+`src/cli/validate.rs`.
 
 ## Updating the taxonomy snapshot
 

@@ -1,0 +1,17 @@
+dataset:
+  - fides_key: categorized
+    collections:
+      - name: t
+        fields:
+          - name: request_log
+            data_categories: [system.operations]
+          - name: tagged
+            data_categories: [user.name]
+system:
+  - fides_key: declared_system
+    system_type: Service
+    privacy_declarations:
+      - name: something declared
+        data_use: analytics
+        data_categories: [user.name]
+        data_subjects: [customer]
