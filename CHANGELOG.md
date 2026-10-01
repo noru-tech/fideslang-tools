@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-01
+
 ### Changed
 - Dependencies refreshed: `serde-saphyr` requirement raised to 1.3 (already locked); all other crates
   and every pinned GitHub Action were already at their latest releases.
@@ -48,7 +50,8 @@ All notable changes to this project are documented here. The format is based on
 - `fl graph` rendering system/dataset/data-use relationships as Graphviz DOT or Mermaid.
 - Shell completions (`fl completions`) and man pages (`fl manpage`).
 
-[Unreleased]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/noru-tech/fideslang-tools/releases/tag/v0.1.0
