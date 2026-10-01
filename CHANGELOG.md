@@ -7,6 +7,16 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- `fl validate --format sarif`: a SARIF 2.1.0 log for GitHub code scanning and other SARIF tools.
+  Every validation code is a rule with a `helpUri` to its page; each finding is a result with its
+  level, message, file and line (the resource's `fides_key` line when it can be found, else 1;
+  findings read from stdin point at `stdin`).
+- `fl validate --format yaml`: the JSON report as YAML, like `fl stats` and `fl taxonomy show`.
+- `fl validate --format json` gains two additive fields: a top-level `"schema_version": 1` and a
+  `"help_uri"` on each finding. Existing fields are unchanged.
+- The text report ends (before the summary line) with one `see <url>` line per code found, linking
+  to `docs/rules/<CODE>.md`; GitHub annotations end with the same link. The base URL is one
+  constant, `DOCS_BASE`.
 - `--no-color` global flag, the same as `--color never`; it wins over `--color` and `FL_COLOR`.
   `NO_COLOR`, `CLICOLOR_FORCE` and `FL_COLOR` behave as before.
 - `-v` / `--verbose` global flag: extra diagnostics on stderr (files loaded, resource counts, the
@@ -30,6 +40,11 @@ All notable changes to this project are documented here. The format is based on
   passing fixtures stay clean and that every code has a documentation page linked from the README.
 - `codeql.yml`: CodeQL static analysis of the Rust, Python and workflow code on every pull request,
   on main and weekly; results go to code scanning.
+
+### Fixed
+- `fl validate --format github` no longer escapes `:` and `,` in annotation messages (only in the
+  `file` and `title` properties, where the runner expects it), so comma-separated "did you mean"
+  suggestions no longer show `%2C`. File paths in `file=` are now escaped too.
 
 ### Changed
 - `--deny` / `--allow` with an unknown code is now a usage error (exit `2`) whose message lists

@@ -16,8 +16,11 @@ use crate::validate::{self, Options, Report, Severity, codes};
 pub enum OutFormat {
     Text,
     Json,
+    Yaml,
     /// GitHub Actions `::error`/`::warning` annotations.
     Github,
+    /// SARIF 2.1.0, for GitHub code scanning and other SARIF tools.
+    Sarif,
 }
 
 #[derive(Debug, ClapArgs)]
@@ -63,6 +66,13 @@ fn write_text(ctx: &mut Ctx, report: &Report) -> Result<()> {
         }
         writeln!(ctx.out, "{line}")?;
     }
+    for code in report.codes() {
+        writeln!(
+            ctx.out,
+            "{}",
+            t.paint(t.dim, &format!("see {}", codes::help_uri(code)))
+        )?;
+    }
     let summary = format!(
         "{} files, {} resources checked against {}: {}, {}",
         report.files,
@@ -94,29 +104,34 @@ fn write_github(ctx: &mut Ctx, report: &Report) -> Result<()> {
         let file = d
             .file
             .as_deref()
-            .map(|f| format!(" file={f}"))
+            .map(|f| format!(" file={}", gh_escape_property(f)))
             .unwrap_or_default();
         let title = format!("{} {}", d.code, d.location());
         let mut msg = d.message.clone();
         if let Some(s) = &d.suggestion {
             msg.push_str(&format!(" ({s})"));
         }
+        msg.push_str(&format!(" — see {}", codes::help_uri(d.code)));
         writeln!(
             ctx.out,
             "::{level}{file},title={}::{}",
-            gh_escape(&title),
-            gh_escape(&msg)
+            gh_escape_property(&title),
+            gh_escape_data(&msg)
         )?;
     }
     Ok(())
 }
 
-fn gh_escape(s: &str) -> String {
+/// Escape the message of a workflow command (the runner unescapes only `%`, CR and LF there).
+fn gh_escape_data(s: &str) -> String {
     s.replace('%', "%25")
         .replace('\r', "%0D")
         .replace('\n', "%0A")
-        .replace(':', "%3A")
-        .replace(',', "%2C")
+}
+
+/// Escape a workflow command property (`file=`, `title=`), where `:` and `,` are separators too.
+fn gh_escape_property(s: &str) -> String {
+    gh_escape_data(s).replace(':', "%3A").replace(',', "%2C")
 }
 
 pub fn run(ctx: &mut Ctx, a: Args) -> Result<Exit> {
@@ -143,8 +158,21 @@ pub fn run(ctx: &mut Ctx, a: Args) -> Result<Exit> {
     ));
     match a.format {
         OutFormat::Text => write_text(ctx, &report)?,
-        OutFormat::Json => {
-            let v = serde_json::to_value(&report)?;
+        OutFormat::Json | OutFormat::Yaml => {
+            let f = if a.format == OutFormat::Json {
+                Format::Json
+            } else {
+                Format::Yaml
+            };
+            format::write_value(&mut ctx.out, &report.to_json_value(), f)?;
+            ctx.note(format!(
+                "{} errors, {} warnings",
+                report.errors(),
+                report.warnings()
+            ));
+        }
+        OutFormat::Sarif => {
+            let v = validate::sarif::to_sarif(&report);
             format::write_value(&mut ctx.out, &v, Format::Json)?;
             ctx.note(format!(
                 "{} errors, {} warnings",

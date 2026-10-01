@@ -168,13 +168,14 @@ EOF
 $ fl validate datamap.yml
 datamap.yml  dataset[users_db].collections[0].fields[1].data_categories[0]
   E001 unknown data category `user.cookie_id` — did you mean `user.device.cookie_id`, `user.device.cookie`, `user.unique_id`?
+see https://github.com/noru-tech/fideslang-tools/blob/main/docs/rules/E001.md
 1 files, 2 resources checked against iab 3.0.0: 1 error, 0 warnings
 $ echo $?
 1
 ```
 
-Every code (`E001` above) has a page that explains it and how to fix it; see
-[Validation rules](#validation-rules).
+Every code (`E001` above) has a page that explains it and how to fix it, and the report ends with a
+link to the page of each code it found; see [Validation rules](#validation-rules).
 
 ### How do I draw a data map from Fides manifests?
 
@@ -228,7 +229,7 @@ they predate Fideslang 3.0 and deliberately fail validation, which makes them a 
 | Area | Commands |
 | --- | --- |
 | Browse the taxonomy | `fl taxonomy list`, `tree`, `show`, `search`, `cat`, `info` |
-| Check a data map | `fl validate` ([stable E0xx/W0xx codes](docs/rules/README.md), "did you mean" suggestions, GitHub annotations) |
+| Check a data map | `fl validate` ([stable E0xx/W0xx codes](docs/rules/README.md), "did you mean" suggestions, GitHub annotations, SARIF) |
 | Transform manifests | `fl cat`, `fl convert` (YAML, JSON, CSV), `fl merge`, `fl split` |
 | Understand a data map | `fl graph` (DOT, Mermaid, JSON), `fl stats`, `fl taxonomy diff` |
 | Shell integration | `fl completions <shell>`, `fl manpage` |
@@ -248,7 +249,7 @@ Full command reference:
 | `fl convert INPUT` | Convert one file between YAML, JSON and CSV (`--to`, or inferred from `-o`) |
 | `fl merge PATH…` | Union many files into one document (`--fail-on-duplicate`, `--dedupe`) |
 | `fl split INPUT` | One file per resource type (`--by type`) or per resource (`--by resource`) |
-| `fl validate PATH…` | Check keys, references, duplicates, custom taxonomy and structure; text, JSON or GitHub annotations |
+| `fl validate PATH…` | Check keys, references, duplicates, custom taxonomy and structure; text, JSON, YAML, GitHub annotations or SARIF |
 | `fl stats PATH…` | Counts, categorized-field coverage, orphan datasets, key usage (`--rollup`, `--top`) |
 | `fl graph PATH…` | Systems ↔ datasets ↔ flows ↔ uses/categories/subjects as DOT, Mermaid or JSON (`--include`, `--focus KEY --depth N`) |
 | `fl completions <shell>` / `fl manpage` | Shell completions and man pages |
@@ -327,9 +328,23 @@ refresh a taxonomy snapshot.
 | `fl taxonomy show`, `search`, `diff`, `info` | `text`, `json`, `yaml` |
 | `fl cat` | `yaml`, `json`, `tree` |
 | `fl convert` (`--to`), `fl merge`, `fl split` | `yaml`, `json`, `csv` (`convert` and `merge` infer from the `-o` extension) |
-| `fl validate` | `text`, `json`, `github` (`::error file=…::` annotations for GitHub Actions) |
+| `fl validate` | `text`, `json`, `yaml`, `github` (`::error file=…::` annotations for GitHub Actions), `sarif` (SARIF 2.1.0 for GitHub code scanning) |
 | `fl stats` | `text`, `json`, `yaml` |
 | `fl graph` | `dot`, `mermaid`, `json` |
+
+`fl validate --format json` (and `yaml`) prints `schema_version` (currently `1`; it changes only
+when a field is removed, renamed or changes meaning), `taxonomy`, `files`, `resources` and
+`diagnostics`; each finding has `code`, `severity`, `file`, `resource`, `path`, `message`, an
+optional `suggestion` and `help_uri`, the link to the code's page. `--format sarif` lists every code
+as a rule with its `helpUri`; each result carries the file and a line: the line of the resource's
+`fides_key` when `fl` can find it, else line 1 (findings read from stdin point at `stdin`). To show the findings in GitHub code scanning:
+
+```yaml
+- run: fl validate --format sarif .fides/ -o fl.sarif || [ $? -eq 1 ]
+- uses: github/codeql-action/upload-sarif@v3   # pin to a commit hash
+  with:
+    sarif_file: fl.sarif
+```
 
 Manifest commands read YAML, JSON or CSV, detected from the file extension (YAML for stdin);
 `--from yaml|json|csv` overrides detection. Global flags:

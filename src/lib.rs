@@ -18,6 +18,10 @@ pub mod stats;
 pub mod taxonomy;
 pub mod validate;
 
+/// Where the documentation is published: links to `docs/rules/<CODE>.md` (in `--format json`,
+/// `sarif`, `github` and `text`) are built from this one constant.
+pub const DOCS_BASE: &str = "https://github.com/noru-tech/fideslang-tools/blob/main";
+
 /// Crate version, as compiled in.
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
