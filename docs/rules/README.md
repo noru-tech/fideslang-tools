@@ -50,7 +50,8 @@ These flags apply to the whole run. There is no inline or per-file suppression.
 | `--strict` | Also run W005 |
 | `--no-custom-taxonomy` | Ignore `data_category` / `data_use` / `data_subject` resources in the manifests when checking E001 |
 
-Codes are case-insensitive (`--allow w002` works). `--allow` wins over `--deny` and `-W` for the same
+Codes are case-insensitive (`--allow w002` works); an unknown code is a usage error (exit `2`) whose
+message lists the valid codes. `--allow` wins over `--deny` and `-W` for the same
 code. `--type` and `--key` narrow which resources are loaded, which also narrows what is checked; a
 reference to a resource you filtered out is then reported as [E003](E003.md).
 

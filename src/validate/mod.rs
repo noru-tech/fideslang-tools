@@ -1,20 +1,9 @@
 //! Manifest validation: stable diagnostic codes, rules, and reports.
 //!
-//! | Code | Severity | Check |
-//! |------|----------|-------|
-//! | E001 | error    | unknown taxonomy key (with "did you mean" suggestions) |
-//! | E002 | error    | duplicate `fides_key` within a resource type |
-//! | E003 | error    | dangling reference (`dataset_references`, ingress/egress, `fides_meta.references`, …) |
-//! | E004 | error    | custom taxonomy `parent_key` missing or not the dotted prefix |
-//! | E005 | error    | custom taxonomy record references itself |
-//! | E006 | error    | invalid `fides_key` syntax |
-//! | E007 | error    | schema: missing required field, wrong type, unknown resource type |
-//! | W001 | warning  | deprecated taxonomy key |
-//! | W002 | warning  | dataset field without `data_categories` |
-//! | W003 | warning  | privacy declaration with no categories or no subjects |
-//! | W004 | warning  | `data_purposes` (deprecated alias of `data_uses`) |
-//! | W005 | warning  | unknown field on a resource (only with `--strict`) |
+//! The codes, their default severity and their titles live in one table, [`codes::CODES`]; each
+//! has a page under `docs/rules/`.
 
+pub mod codes;
 pub mod rules;
 pub mod suggest;
 

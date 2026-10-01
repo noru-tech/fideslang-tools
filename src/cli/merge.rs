@@ -31,7 +31,7 @@ pub struct Args {
 }
 
 pub fn run(ctx: &mut Ctx, a: Args) -> Result<Exit> {
-    let m = load_manifests(a.paths, a.from, &a.filter)?;
+    let m = load_manifests(ctx, a.paths, a.from, &a.filter)?;
     let mut dups = Vec::new();
     for t in m.resource_types() {
         let mut seen = HashSet::new();

@@ -49,13 +49,14 @@ snapshots. If you change output on purpose, review and accept the new snapshots 
 `cargo insta review` (install with `cargo install cargo-insta`) and commit the `.snap` files.
 
 Adding a validation rule: add a file under `src/validate/rules/`, give it the next free stable code
-(`E0xx` for errors, `W0xx` for warnings), register it in `src/validate/mod.rs`, add a minimal failing
+(`E0xx` for errors, `W0xx` for warnings) and add it to the code table in `src/validate/codes.rs`
+(code, severity, title: `-W`, `--deny` / `--allow` checking and the docs test read it), register the
+rule in `src/validate/mod.rs`, add a minimal failing
 fixture under `tests/fixtures/invalid/` and its corrected copy under `tests/fixtures/valid/`, write
 `docs/rules/<CODE>.md` (copy an existing page: rule, why it matters, controls, failing and passing
 example with real `fl validate` output, how to fix, how to suppress), list it in
-`docs/rules/README.md`, and link it from the README table. `cargo test` fails if a code has no page
-or a passing fixture is not clean. A new warning also needs adding to the `-W` list in
-`src/cli/validate.rs`.
+`docs/rules/README.md`, and link it from the README table. `cargo test` fails if a rule emits a code missing from
+the table (or with another severity), if a code has no page, or if a passing fixture is not clean.
 
 ## Updating the taxonomy snapshot
 

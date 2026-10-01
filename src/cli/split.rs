@@ -59,7 +59,7 @@ pub fn run(ctx: &mut Ctx, a: Args) -> Result<Exit> {
     if a.format == Format::Csv {
         bail!("split writes manifests; use --format yaml or json (convert can produce CSV)");
     }
-    let m = load_manifests(a.paths, a.from, &a.filter)?;
+    let m = load_manifests(ctx, a.paths, a.from, &a.filter)?;
     fs::create_dir_all(&a.out_dir)
         .with_context(|| format!("cannot create {}", a.out_dir.display()))?;
     let mut written = Vec::new();

@@ -53,7 +53,7 @@ pub struct Args {
 }
 
 pub fn run(ctx: &mut Ctx, a: Args) -> Result<Exit> {
-    let m = load_manifests(a.paths, a.from, &a.filter)?;
+    let m = load_manifests(ctx, a.paths, a.from, &a.filter)?;
     let opts = if a.bare {
         Options::default()
     } else if a.include.is_empty() {

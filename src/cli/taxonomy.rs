@@ -36,6 +36,21 @@ pub enum Cmd {
     Info(InfoArgs),
 }
 
+impl Cmd {
+    /// `taxonomy list`, `taxonomy diff`, … for messages.
+    pub fn name(&self) -> &'static str {
+        match self {
+            Cmd::List(_) => "taxonomy list",
+            Cmd::Cat(_) => "taxonomy cat",
+            Cmd::Tree(_) => "taxonomy tree",
+            Cmd::Show(_) => "taxonomy show",
+            Cmd::Search(_) => "taxonomy search",
+            Cmd::Diff(_) => "taxonomy diff",
+            Cmd::Info(_) => "taxonomy info",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
 pub enum ListFormat {
     Table,
@@ -674,7 +689,7 @@ fn diff_cmd(ctx: &mut Ctx, a: DiffArgs) -> Result<Exit> {
         a.kinds.clone()
     };
     let paths = crate::manifest::load::default_paths(a.paths)?;
-    let m = crate::manifest::load::load(&paths, None).context("loading manifests")?;
+    let m = super::load_unfiltered(ctx, paths.clone(), None).context("loading manifests")?;
     let label = paths
         .iter()
         .map(|p| p.display().to_string())

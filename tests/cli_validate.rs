@@ -79,12 +79,15 @@ fn valid_fixtures_are_clean() {
     }
 }
 
-/// Every code a rule can emit has a page under `docs/rules/`, listed in the index and linked from
-/// the README table.
+/// The central code table (`validate::codes::CODES`) lists exactly the codes the rules emit, and
+/// every code in it has a page under `docs/rules/`, listed in the index with its severity and
+/// linked from the README table.
 #[test]
 fn every_code_has_a_docs_page() {
+    use fideslang_cli::validate::codes::CODES;
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
-    let mut codes = std::collections::BTreeSet::new();
+    // Codes that appear as string literals in the rules.
+    let mut emitted = std::collections::BTreeSet::new();
     for entry in std::fs::read_dir(root.join("src/validate/rules")).unwrap() {
         let src = std::fs::read_to_string(entry.unwrap().path()).unwrap();
         for part in src.split('"').skip(1).step_by(2) {
@@ -93,27 +96,72 @@ fn every_code_has_a_docs_page() {
                 && (b[0] == b'E' || b[0] == b'W')
                 && b[1..].iter().all(u8::is_ascii_digit)
             {
-                codes.insert(part.to_string());
+                emitted.insert(part.to_string());
             }
         }
     }
-    assert!(codes.len() >= 12, "{codes:?}");
+    let table: std::collections::BTreeSet<String> =
+        CODES.iter().map(|c| c.code.to_string()).collect();
+    assert_eq!(
+        emitted, table,
+        "src/validate/rules and validate::codes::CODES disagree"
+    );
+    assert!(table.len() >= 12, "{table:?}");
     let index = std::fs::read_to_string(root.join("docs/rules/README.md")).unwrap();
     let readme = std::fs::read_to_string(root.join("README.md")).unwrap();
-    for code in &codes {
+    for c in CODES {
+        let code = c.code;
         assert!(
             root.join(format!("docs/rules/{code}.md")).is_file(),
             "missing docs/rules/{code}.md"
         );
         assert!(
-            index.contains(&format!("]({code}.md)")),
-            "{code} not in docs/rules/README.md"
+            index.contains(&format!("| [{code}]({code}.md) | {} |", c.severity)),
+            "{code} not in docs/rules/README.md as {}",
+            c.severity
         );
         assert!(
-            readme.contains(&format!("](docs/rules/{code}.md)")),
-            "{code} not linked from README.md"
+            readme.contains(&format!(
+                "| [{code}](docs/rules/{code}.md) | {} |",
+                c.severity
+            )),
+            "{code} not linked from README.md as {}",
+            c.severity
         );
     }
+}
+
+#[test]
+fn unknown_codes_in_deny_and_allow_are_usage_errors() {
+    for flag in ["--deny", "--allow"] {
+        fl().args(["validate", flag, "W002,X123"])
+            .arg(invalid("w004_data_purposes.yml"))
+            .assert()
+            .code(2)
+            .stdout("")
+            .stderr(predicate::str::contains("unknown validation code `X123`"))
+            .stderr(predicate::str::contains(
+                "valid codes: E001, E002, E003, E004, E005, E006, E007, W001, W002, W003, W004, W005",
+            ));
+    }
+    // Known codes still work in any case.
+    fl().args(["validate", "--allow", "w004"])
+        .arg(invalid("w004_data_purposes.yml"))
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("0 warnings"));
+}
+
+/// `-W` promotes every warning in the code table.
+#[test]
+fn warnings_as_errors_covers_every_warning_code() {
+    let out = stdout(
+        fl().args(["-q", "validate", "-W", "--strict", "--format", "json"])
+            .arg(invalid("w005_unknown_field.yml")),
+    );
+    let v: serde_json::Value = serde_json::from_str(&out).unwrap();
+    assert_eq!(v["diagnostics"][0]["code"], "W005");
+    assert_eq!(v["diagnostics"][0]["severity"], "error");
 }
 
 #[test]

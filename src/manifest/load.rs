@@ -14,6 +14,16 @@ use crate::format::{self, Format};
 /// The conventional manifest directory used by the Fides CLI.
 pub const DEFAULT_DIR: &str = ".fides";
 
+/// A manifest path that does not exist, or no path and no `./.fides/`. The CLI adds a hint
+/// telling the user to pass a file or directory.
+#[derive(Debug, thiserror::Error)]
+pub enum PathError {
+    #[error("{0}: no such file or directory")]
+    NotFound(String),
+    #[error("no manifest path given and no ./{DEFAULT_DIR}/ directory found")]
+    NoDefault,
+}
+
 fn is_manifest_file(path: &Path) -> bool {
     matches!(
         path.extension()
@@ -47,7 +57,7 @@ pub fn expand_paths(paths: &[PathBuf]) -> Result<Vec<PathBuf>> {
         } else if p.exists() {
             out.push(p.clone());
         } else {
-            bail!("{}: no such file or directory", p.display());
+            return Err(PathError::NotFound(p.display().to_string()).into());
         }
     }
     Ok(out)
@@ -62,7 +72,7 @@ pub fn default_paths(paths: Vec<PathBuf>) -> Result<Vec<PathBuf>> {
     if d.is_dir() {
         Ok(vec![d.to_path_buf()])
     } else {
-        bail!("no manifest path given and no ./{DEFAULT_DIR}/ directory found")
+        Err(PathError::NoDefault.into())
     }
 }
 
@@ -84,9 +94,20 @@ pub fn load_into(manifest: &mut Manifest, path: &Path, format: Option<Format>) -
 
 /// Load and union every manifest under `paths`.
 pub fn load(paths: &[PathBuf], format: Option<Format>) -> Result<Manifest> {
+    load_each(paths, format, |_, _| {})
+}
+
+/// Like [`load`], calling `on_file(path, resources_added)` after each file.
+pub fn load_each(
+    paths: &[PathBuf],
+    format: Option<Format>,
+    mut on_file: impl FnMut(&Path, usize),
+) -> Result<Manifest> {
     let mut manifest = Manifest::new();
     for p in expand_paths(paths)? {
+        let before = manifest.len();
         load_into(&mut manifest, &p, format).with_context(|| format!("loading {}", p.display()))?;
+        on_file(&p, manifest.len() - before);
     }
     Ok(manifest)
 }
