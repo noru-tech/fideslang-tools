@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+- Dependencies refreshed: `serde-saphyr` requirement raised to 1.3 (already locked); all other crates
+  and every pinned GitHub Action were already at their latest releases.
+
 ## [0.1.2] - 2026-09-30
 
 ### Added
