@@ -10,7 +10,7 @@ Install:
 - Prebuilt binary via cargo: `cargo binstall fideslang-cli`
 - From source (Rust 1.89+): `cargo install --locked fideslang-cli`
 
-Common commands: `fl taxonomy show user.contact.email`, `fl taxonomy search cookie`, `fl taxonomy tree categories --depth 2`, `fl validate .fides/`, `fl graph .fides/ --format mermaid`, `fl convert datamap.yml --to json`, `fl merge .fides/ -o all.yml`, `fl stats .fides/`. Manifest commands default to `./.fides/` when no path is given.
+Common commands: `fl taxonomy show user.contact.email`, `fl taxonomy search cookie`, `fl taxonomy tree categories --depth 2`, `fl validate .fides/`, `fl graph .fides/ --format mermaid`, `fl convert datamap.yml --to json`, `fl merge .fides/ -o all.yml`, `fl stats .fides/`. Manifest commands default to `./.fides/` when no path is given. `fl doctor` reports the version, bundled taxonomy, color decision and installed completions. `fl` never contacts the network or checks for updates; update with `brew upgrade fl`, `cargo binstall fideslang-cli` or GitHub Releases.
 
 `fl validate` reports findings with stable codes (E001-E007 errors, W001-W005 warnings) and exits 0 (clean or warnings only), 1 (at least one error) or 2 (usage, input or I/O error). `--format json` (with `schema_version` and a `help_uri` per finding), `yaml`, `github` (Actions annotations) and `sarif` (SARIF 2.1.0 for code scanning) give machine-readable output.
 

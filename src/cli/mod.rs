@@ -3,6 +3,7 @@
 pub mod cat;
 pub mod completions;
 pub mod convert;
+pub mod doctor;
 pub mod graph;
 pub mod merge;
 pub mod split;
@@ -67,6 +68,36 @@ pub struct Global {
     /// Print extra diagnostics to stderr (files loaded, counts, timings). Never changes stdout.
     #[arg(short, long, global = true)]
     pub verbose: bool,
+
+    /// Where `--color` came from (filled in by [`parse`], for `fl doctor`).
+    #[arg(skip)]
+    pub color_source: ColorSource,
+}
+
+/// Where the `--color` setting came from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum ColorSource {
+    /// Not given: the default, `auto`.
+    #[default]
+    Default,
+    /// `--color` on the command line.
+    Flag,
+    /// The `FL_COLOR` environment variable.
+    Env,
+}
+
+/// Parse the process's command line (exits on a usage error, like `Cli::parse`), recording where
+/// `--color` came from.
+pub fn parse() -> Cli {
+    use clap::{CommandFactory, FromArgMatches, parser::ValueSource};
+    let matches = Cli::command().get_matches();
+    let mut cli = Cli::from_arg_matches(&matches).unwrap_or_else(|e| e.exit());
+    cli.global.color_source = match matches.value_source("color") {
+        Some(ValueSource::CommandLine) => ColorSource::Flag,
+        Some(ValueSource::EnvVariable) => ColorSource::Env,
+        _ => ColorSource::Default,
+    };
+    cli
 }
 
 impl Global {
@@ -103,6 +134,8 @@ pub enum Command {
     Completions(completions::Args),
     /// Generate man pages.
     Manpage(completions::ManArgs),
+    /// Report version, bundled taxonomy, color decision, ./.fides and installed completions.
+    Doctor(doctor::Args),
 }
 
 impl Command {
@@ -119,6 +152,7 @@ impl Command {
             Command::Graph(_) => "graph",
             Command::Completions(_) => "completions",
             Command::Manpage(_) => "manpage",
+            Command::Doctor(_) => "doctor",
         }
     }
 }
@@ -194,6 +228,7 @@ pub fn run(cli: Cli) -> Result<Exit> {
         Command::Graph(args) => graph::run(&mut ctx, args),
         Command::Completions(args) => completions::run(&mut ctx, args),
         Command::Manpage(args) => completions::run_man(&mut ctx, args),
+        Command::Doctor(args) => doctor::run(&mut ctx, args),
     }?;
     std::io::Write::flush(&mut ctx.out)?;
     ctx.debug(format!(
