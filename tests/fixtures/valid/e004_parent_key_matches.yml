@@ -1,0 +1,7 @@
+data_use:
+  - fides_key: analytics.reporting.custom
+    name: Custom Reporting
+    parent_key: analytics.reporting
+  - fides_key: marketing.custom_no_parent
+    name: Explicit parent
+    parent_key: marketing

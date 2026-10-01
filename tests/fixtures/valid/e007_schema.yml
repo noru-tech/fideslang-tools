@@ -1,0 +1,11 @@
+system:
+  - fides_key: typed_system
+    system_type: Service
+    privacy_declarations:
+      - name: has a data_use
+        data_use: analytics
+        data_categories: [user.name]
+        data_subjects: [customer]
+dataset:
+  - fides_key: with_collections
+    collections: []

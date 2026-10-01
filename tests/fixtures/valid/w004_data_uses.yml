@@ -1,0 +1,8 @@
+dataset:
+  - fides_key: current_uses
+    data_uses: [analytics]
+    collections:
+      - name: t
+        fields:
+          - name: f
+            data_categories: [user.name]

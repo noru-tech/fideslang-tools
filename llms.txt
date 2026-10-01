@@ -1,0 +1,39 @@
+# fideslang-tools
+
+> Rust CLI for Fideslang privacy taxonomies and Fides manifests. Browse, validate, merge, convert and graph data maps offline.
+
+The binary is `fl`; the crate on crates.io is `fideslang-cli` (the crate named `fl` is an unrelated tool). It is a single static binary with the IAB Tech Lab Privacy Taxonomy (fideslang 3.0.0: 85 data categories, 55 data uses, 15 data subjects) compiled in. It needs no Python, no Fides server and no network, and it collects no telemetry. MIT-licensed code; the vendored taxonomy is CC BY 4.0.
+
+Install:
+
+- Homebrew (macOS, Linux): `brew install noru-tech/tap/fl`
+- Prebuilt binary via cargo: `cargo binstall fideslang-cli`
+- From source (Rust 1.89+): `cargo install --locked fideslang-cli`
+
+Common commands: `fl taxonomy show user.contact.email`, `fl taxonomy search cookie`, `fl taxonomy tree categories --depth 2`, `fl validate .fides/`, `fl graph .fides/ --format mermaid`, `fl convert datamap.yml --to json`, `fl merge .fides/ -o all.yml`, `fl stats .fides/`. Manifest commands default to `./.fides/` when no path is given.
+
+`fl validate` reports findings with stable codes (E001-E007 errors, W001-W005 warnings) and exits 0 (clean or warnings only), 1 (at least one error) or 2 (usage, input or I/O error). `--format json` and `--format github` give machine-readable output.
+
+## Docs
+
+- [README](https://github.com/noru-tech/fideslang-tools/blob/main/README.md): what fl does, install, quick start, command reference
+- [How do I validate a Fides manifest offline?](https://github.com/noru-tech/fideslang-tools/blob/main/README.md#how-do-i-validate-a-fides-manifest-offline): `fl validate` walkthrough with real output
+- [How do I draw a data map from Fides manifests?](https://github.com/noru-tech/fideslang-tools/blob/main/README.md#how-do-i-draw-a-data-map-from-fides-manifests): `fl graph` as DOT, Mermaid or JSON
+- [Validation rules](https://github.com/noru-tech/fideslang-tools/blob/main/docs/rules/README.md): index of every E0xx/W0xx code, with one page per code (rule, why, failing and passing example, fix, suppression)
+- [Exit codes](https://github.com/noru-tech/fideslang-tools/blob/main/docs/exit-codes.md): 0 success, 1 findings, 2 error
+- [Output formats and exit codes](https://github.com/noru-tech/fideslang-tools/blob/main/README.md#output-formats-and-exit-codes): `--format` values per command and global flags
+- [What it is not, and known limitations](https://github.com/noru-tech/fideslang-tools/blob/main/README.md#what-it-is-not-and-known-limitations): not a Fides client, not a compliance verdict, one taxonomy version per build
+
+## Reference
+
+- [Taxonomy provenance](https://github.com/noru-tech/fideslang-tools/blob/main/taxonomy/SOURCE.md): upstream tag and commit of the bundled taxonomy, license, refresh recipe
+- [Security policy](https://github.com/noru-tech/fideslang-tools/blob/main/SECURITY.md): private vulnerability reporting and threat model
+- [Changelog](https://github.com/noru-tech/fideslang-tools/blob/main/CHANGELOG.md): release notes
+- [How to cite](https://github.com/noru-tech/fideslang-tools/blob/main/CITATION.cff): CITATION.cff metadata
+
+## Optional
+
+- [Contributing](https://github.com/noru-tech/fideslang-tools/blob/main/CONTRIBUTING.md): layout, adding a validation rule, refreshing the taxonomy, releases
+- [OpenSSF Best Practices self-assessment](https://github.com/noru-tech/fideslang-tools/blob/main/docs/openssf-best-practices.md): prepared answers for the "passing" badge
+- [Fideslang upstream](https://github.com/IABTechLab/fideslang): the IAB Tech Lab Privacy Taxonomy and its Python models
+- [Releases](https://github.com/noru-tech/fideslang-tools/releases/latest): prebuilt archives with SHA-256 checksums, artifact attestations and a CycloneDX SBOM

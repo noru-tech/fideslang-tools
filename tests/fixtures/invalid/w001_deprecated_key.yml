@@ -1,0 +1,8 @@
+system:
+  - fides_key: deprecated_use_system
+    system_type: Service
+    privacy_declarations:
+      - name: profiles for content
+        data_use: personalize.profiling
+        data_categories: [user.behavior]
+        data_subjects: [customer]
