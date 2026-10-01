@@ -7,6 +7,16 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- `--no-color` global flag, the same as `--color never`; it wins over `--color` and `FL_COLOR`.
+  `NO_COLOR`, `CLICOLOR_FORCE` and `FL_COLOR` behave as before.
+- `-v` / `--verbose` global flag: extra diagnostics on stderr (files loaded, resource counts, the
+  filter's effect, timings, the exit code). Stdout is byte-identical with and without it.
+- A missing manifest path (or no path and no `./.fides/`) now prints a fix hint,
+  `hint: pass a file or directory, e.g. fl validate path/to/manifests`, after the error. Exit code
+  stays `2`.
+- `src/validate/codes.rs`: one table of validation codes (code, severity, title). `-W`, the
+  `--deny` / `--allow` check and the docs test read it; `cargo test` fails if a rule emits a code
+  that is not in the table, or with another severity, or if a code has no docs page.
 - `docs/rules/`: one page per validation code (E001–E007, W001–W005) with the rule, why it matters,
   the controls it relates to, a failing and a passing example with real `fl validate` output, how to
   fix it and how to promote or silence it, plus an index. The README rules table links each code.
@@ -22,6 +32,10 @@ All notable changes to this project are documented here. The format is based on
   on main and weekly; results go to code scanning.
 
 ### Changed
+- `--deny` / `--allow` with an unknown code is now a usage error (exit `2`) whose message lists
+  the valid codes; it used to be accepted and ignored.
+- Writing to a closed pipe (`fl taxonomy list all --format plain | head -1`) now stops quietly
+  with exit `0` instead of printing `error: Broken pipe`.
 - README: several headings are now the questions people ask ("How do I install fl?", "How do I
   validate a Fides manifest offline?", "How do I draw a data map from Fides manifests?", "How do I
   cite fl?"), each answered in its first sentence. The E003 row now lists `organization_fides_key`.

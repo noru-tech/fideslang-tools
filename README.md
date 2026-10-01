@@ -303,7 +303,8 @@ fix it; the index is [docs/rules](docs/rules/README.md).
 
 Custom `data_category` / `data_use` / `data_subject` resources declared in the manifest set extend
 the taxonomy for E001 (disable with `--no-custom-taxonomy`). `--deny CODE` promotes a code to an
-error, `--allow CODE` silences it, `-W` treats every warning as an error.
+error, `--allow CODE` silences it, `-W` treats every warning as an error. An unknown code in
+`--deny` / `--allow` is a usage error (exit `2`) that lists the valid codes.
 
 ### Building from source
 
@@ -331,16 +332,26 @@ refresh a taxonomy snapshot.
 | `fl graph` | `dot`, `mermaid`, `json` |
 
 Manifest commands read YAML, JSON or CSV, detected from the file extension (YAML for stdin);
-`--from yaml|json|csv` overrides detection. Global flags: `--color auto|always|never` (also `FL_COLOR`; honors `NO_COLOR`), `-o FILE`,
-`-q` (suppress the summary lines on stderr).
+`--from yaml|json|csv` overrides detection. Global flags:
+
+| Flag | Effect |
+| --- | --- |
+| `--color auto\|always\|never` | When to color output (also `FL_COLOR`; `auto` honors `NO_COLOR` and `CLICOLOR_FORCE`) |
+| `--no-color` | Same as `--color never`; wins over `--color` and `FL_COLOR` |
+| `-o FILE` | Write output to `FILE` instead of stdout |
+| `-q`, `--quiet` | Suppress the summary lines on stderr |
+| `-v`, `--verbose` | Extra diagnostics on stderr: files loaded, resource counts, timings. Stdout is identical with and without it |
+
+When the reader of a pipe goes away (`fl taxonomy list all --format plain | head -1`), `fl` stops
+quietly with exit `0`.
 
 Exit codes (details in [docs/exit-codes.md](docs/exit-codes.md)):
 
 | Code | Meaning |
 | --- | --- |
-| `0` | Success, including `fl validate` with warnings only |
+| `0` | Success, including `fl validate` with warnings only, and output cut short by a closed pipe |
 | `1` | Findings: `fl validate` reported at least one error (warnings count once promoted by `-W` or `--deny`), or `fl taxonomy diff --exit-code` found a difference |
-| `2` | Error: invalid command line, unreadable or unparsable input, I/O failure, or `fl merge --fail-on-duplicate` found a duplicate `fides_key` |
+| `2` | Error: invalid command line (including an unknown code in `--deny` / `--allow`), missing, unreadable or unparsable input, I/O failure, or `fl merge --fail-on-duplicate` found a duplicate `fides_key` |
 
 ## How do I cite fl?
 

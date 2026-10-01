@@ -36,12 +36,19 @@ pub enum Exit {
     Error,
 }
 
+impl Exit {
+    /// The numeric process exit code.
+    pub fn code(self) -> u8 {
+        match self {
+            Exit::Ok => 0,
+            Exit::Findings => 1,
+            Exit::Error => 2,
+        }
+    }
+}
+
 impl From<Exit> for std::process::ExitCode {
     fn from(e: Exit) -> Self {
-        match e {
-            Exit::Ok => std::process::ExitCode::SUCCESS,
-            Exit::Findings => std::process::ExitCode::from(1),
-            Exit::Error => std::process::ExitCode::from(2),
-        }
+        std::process::ExitCode::from(e.code())
     }
 }

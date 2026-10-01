@@ -11,13 +11,14 @@ pub mod taxonomy;
 pub mod validate;
 
 use std::path::PathBuf;
+use std::time::Instant;
 
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 
 use crate::Exit;
 use crate::render::{ColorChoice, Output, Theme};
-use crate::taxonomy::{Taxonomy, embedded};
+use crate::taxonomy::{Kind, Taxonomy, embedded};
 
 const ABOUT: &str = "fl — work with Fideslang taxonomies and Fides manifests";
 const LONG_ABOUT: &str = "\
@@ -51,6 +52,10 @@ pub struct Global {
     )]
     pub color: ColorChoice,
 
+    /// Never use colors; the same as `--color never` (and wins over it and over FL_COLOR).
+    #[arg(long, global = true)]
+    pub no_color: bool,
+
     /// Write output to FILE instead of stdout.
     #[arg(short = 'o', long, global = true, value_name = "FILE")]
     pub output: Option<PathBuf>,
@@ -58,6 +63,21 @@ pub struct Global {
     /// Suppress summary lines on stderr.
     #[arg(short, long, global = true)]
     pub quiet: bool,
+
+    /// Print extra diagnostics to stderr (files loaded, counts, timings). Never changes stdout.
+    #[arg(short, long, global = true)]
+    pub verbose: bool,
+}
+
+impl Global {
+    /// The color setting in effect: `--no-color` wins over `--color` and `FL_COLOR`.
+    pub fn color_choice(&self) -> ColorChoice {
+        if self.no_color {
+            ColorChoice::Never
+        } else {
+            self.color
+        }
+    }
 }
 
 #[derive(Debug, Subcommand)]
@@ -85,6 +105,24 @@ pub enum Command {
     Manpage(completions::ManArgs),
 }
 
+impl Command {
+    /// The subcommand as typed after `fl`, for messages (`validate`, `taxonomy diff`).
+    pub fn name(&self) -> &'static str {
+        match self {
+            Command::Taxonomy(cmd) => cmd.name(),
+            Command::Cat(_) => "cat",
+            Command::Convert(_) => "convert",
+            Command::Merge(_) => "merge",
+            Command::Split(_) => "split",
+            Command::Validate(_) => "validate",
+            Command::Stats(_) => "stats",
+            Command::Graph(_) => "graph",
+            Command::Completions(_) => "completions",
+            Command::Manpage(_) => "manpage",
+        }
+    }
+}
+
 /// Everything a subcommand needs.
 pub struct Ctx {
     pub global: Global,
@@ -100,14 +138,48 @@ impl Ctx {
             anstream::eprintln!("{}", msg.as_ref());
         }
     }
+
+    /// Print a diagnostic line to stderr with `--verbose`. Never writes to stdout.
+    pub fn debug(&self, msg: impl AsRef<str>) {
+        verbose(self.global.verbose, msg);
+    }
+}
+
+fn plural(n: usize, word: &str) -> String {
+    format!("{n} {word}{}", if n == 1 { "" } else { "s" })
+}
+
+fn verbose(on: bool, msg: impl AsRef<str>) {
+    if on {
+        let style = anstyle::Style::new().dimmed();
+        anstream::eprintln!("{style}verbose:{style:#} {}", msg.as_ref());
+    }
 }
 
 /// Run a parsed command line.
 pub fn run(cli: Cli) -> Result<Exit> {
-    cli.global.color.apply();
+    let started = Instant::now();
+    cli.global.color_choice().apply();
+    let v = cli.global.verbose;
+    verbose(
+        v,
+        format!("fl {} · {}", crate::version(), cli.command.name()),
+    );
+    let tax = embedded::load();
+    verbose(
+        v,
+        format!(
+            "taxonomy {}: {} data categories, {} data uses, {} data subjects ({:.1?})",
+            tax.label(),
+            tax.table(Kind::Category).len(),
+            tax.table(Kind::Use).len(),
+            tax.table(Kind::Subject).len(),
+            started.elapsed()
+        ),
+    );
     let mut ctx = Ctx {
         theme: Theme::default(),
-        tax: embedded::load(),
+        tax,
         out: Output::open(cli.global.output.as_deref())?,
         global: cli.global,
     };
@@ -124,7 +196,28 @@ pub fn run(cli: Cli) -> Result<Exit> {
         Command::Manpage(args) => completions::run_man(&mut ctx, args),
     }?;
     std::io::Write::flush(&mut ctx.out)?;
+    ctx.debug(format!(
+        "exit {} after {:.1?}",
+        exit.code(),
+        started.elapsed()
+    ));
     Ok(exit)
+}
+
+/// True when `err` comes from writing to a closed pipe (`fl … | head -1`). `fl` then stops quietly
+/// with exit 0, like other Unix tools.
+pub fn is_broken_pipe(err: &anyhow::Error) -> bool {
+    err.chain().any(|e| {
+        e.downcast_ref::<std::io::Error>()
+            .is_some_and(|io| io.kind() == std::io::ErrorKind::BrokenPipe)
+    })
+}
+
+/// A one-line fix suggestion for errors the user can fix on the command line.
+pub fn hint(err: &anyhow::Error, command: &str) -> Option<String> {
+    err.chain()
+        .find_map(|e| e.downcast_ref::<crate::manifest::load::PathError>())
+        .map(|_| format!("pass a file or directory, e.g. fl {command} path/to/manifests"))
 }
 
 /// Shared `--type` / `--key` filter flags.
@@ -146,13 +239,47 @@ impl FilterArgs {
 
 /// Load manifests from `paths` (defaulting to `.fides/`) and apply the filter.
 pub fn load_manifests(
+    ctx: &Ctx,
     paths: Vec<PathBuf>,
     format: Option<crate::format::Format>,
     filter: &FilterArgs,
 ) -> Result<crate::manifest::Manifest> {
+    let m = load_unfiltered(ctx, paths, format)?;
+    let filter = filter.build()?;
+    if filter.is_noop() {
+        return Ok(m);
+    }
+    let filtered = filter.apply(&m);
+    ctx.debug(format!(
+        "filter kept {} of {} resources",
+        filtered.len(),
+        m.len()
+    ));
+    Ok(filtered)
+}
+
+/// Load manifests from `paths` (defaulting to `.fides/`), logging each file with `--verbose`.
+pub fn load_unfiltered(
+    ctx: &Ctx,
+    paths: Vec<PathBuf>,
+    format: Option<crate::format::Format>,
+) -> Result<crate::manifest::Manifest> {
+    let started = Instant::now();
     let paths = crate::manifest::load::default_paths(paths)?;
-    let m = crate::manifest::load::load(&paths, format)?;
-    Ok(filter.build()?.apply(&m))
+    let m = crate::manifest::load::load_each(&paths, format, |p, added| {
+        ctx.debug(format!(
+            "loaded {} ({})",
+            p.display(),
+            plural(added, "resource")
+        ));
+    })?;
+    ctx.debug(format!(
+        "{}, {} loaded in {:.1?}",
+        plural(m.files().len(), "file"),
+        plural(m.len(), "resource"),
+        started.elapsed()
+    ));
+    Ok(m)
 }
 
 /// Parse a taxonomy kind argument (`categories`, `uses`, `subjects`, many aliases).

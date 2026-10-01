@@ -10,7 +10,7 @@ use clap::{Args as ClapArgs, ValueEnum};
 use super::{Ctx, FilterArgs, load_manifests};
 use crate::Exit;
 use crate::format::{self, Format};
-use crate::validate::{self, Options, Report, Severity};
+use crate::validate::{self, Options, Report, Severity, codes};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
 pub enum OutFormat {
@@ -37,10 +37,10 @@ pub struct Args {
     #[arg(short = 'W', long)]
     pub warnings_as_errors: bool,
     /// Promote these codes to errors (comma-separated, repeatable).
-    #[arg(long, value_name = "CODE", value_delimiter = ',')]
+    #[arg(long, value_name = "CODE", value_delimiter = ',', value_parser = codes::parse)]
     pub deny: Vec<String>,
     /// Silence these codes (comma-separated, repeatable).
-    #[arg(long, value_name = "CODE", value_delimiter = ',')]
+    #[arg(long, value_name = "CODE", value_delimiter = ',', value_parser = codes::parse)]
     pub allow: Vec<String>,
     /// Ignore data_category / data_use / data_subject resources declared in the manifests.
     #[arg(long)]
@@ -120,27 +120,27 @@ fn gh_escape(s: &str) -> String {
 }
 
 pub fn run(ctx: &mut Ctx, a: Args) -> Result<Exit> {
-    let m = load_manifests(a.paths, a.from, &a.filter)?;
+    let m = load_manifests(ctx, a.paths, a.from, &a.filter)?;
     let mut opts = Options {
         strict: a.strict,
         no_custom_taxonomy: a.no_custom_taxonomy,
-        deny: a
-            .deny
-            .iter()
-            .map(|c| c.to_ascii_uppercase())
-            .collect::<BTreeSet<_>>(),
-        allow: a
-            .allow
-            .iter()
-            .map(|c| c.to_ascii_uppercase())
-            .collect::<BTreeSet<_>>(),
+        // Already upper-cased and checked against the code table by `codes::parse`.
+        deny: a.deny.into_iter().collect::<BTreeSet<_>>(),
+        allow: a.allow.into_iter().collect::<BTreeSet<_>>(),
     };
     if a.warnings_as_errors {
-        for code in ["W001", "W002", "W003", "W004", "W005"] {
-            opts.deny.insert(code.to_string());
-        }
+        opts.deny
+            .extend(codes::warnings().map(|c| c.code.to_string()));
     }
+    let started = std::time::Instant::now();
     let report = validate::validate(&m, ctx.tax, &opts);
+    ctx.debug(format!(
+        "validated: {} findings ({} errors, {} warnings) in {:.1?}",
+        report.diagnostics.len(),
+        report.errors(),
+        report.warnings(),
+        started.elapsed()
+    ));
     match a.format {
         OutFormat::Text => write_text(ctx, &report)?,
         OutFormat::Json => {

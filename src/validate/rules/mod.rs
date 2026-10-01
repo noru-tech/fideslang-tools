@@ -27,6 +27,11 @@ pub(crate) fn diag(
     path: impl Into<String>,
     message: impl Into<String>,
 ) -> Diagnostic {
+    debug_assert_eq!(
+        super::codes::lookup(code).map(|c| c.severity),
+        Some(severity),
+        "{code} is missing from validate::codes::CODES or listed with another severity"
+    );
     Diagnostic {
         code,
         severity,
