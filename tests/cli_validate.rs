@@ -269,3 +269,237 @@ fn stats_text_and_json() {
     );
     assert_eq!(v["rollup"]["data_category"]["user"], 6);
 }
+
+const DOCS: &str = "https://github.com/noru-tech/fideslang-tools/blob/main/docs/rules";
+
+#[test]
+fn json_has_schema_version_and_help_uris() {
+    let out = stdout(
+        fl().args(["-q", "validate", "--format", "json"])
+            .arg(invalid("e001_unknown_key.yml")),
+    );
+    let v: serde_json::Value = serde_json::from_str(&out).unwrap();
+    assert_eq!(v["schema_version"], 1);
+    let keys: Vec<&str> = v.as_object().unwrap().keys().map(String::as_str).collect();
+    assert_eq!(
+        keys,
+        [
+            "schema_version",
+            "taxonomy",
+            "files",
+            "resources",
+            "diagnostics"
+        ]
+    );
+    for d in v["diagnostics"].as_array().unwrap() {
+        assert_eq!(d["help_uri"], format!("{DOCS}/E001.md"));
+        // The existing fields are unchanged.
+        for f in ["code", "severity", "file", "resource", "path", "message"] {
+            assert!(d.get(f).is_some(), "{f} missing in {d}");
+        }
+    }
+}
+
+#[test]
+fn yaml_format_matches_json() {
+    let fixture = invalid("w002_w003_hygiene.yml");
+    let json = stdout(
+        fl().args(["-q", "validate", "--format", "json"])
+            .arg(&fixture),
+    );
+    let yaml = stdout(
+        fl().args(["-q", "validate", "--format", "yaml"])
+            .arg(&fixture),
+    );
+    assert!(yaml.starts_with("schema_version: 1\n"), "{yaml}");
+    let json = fideslang_cli::format::to_string(
+        &serde_json::from_str(&json).unwrap(),
+        fideslang_cli::format::Format::Yaml,
+    )
+    .unwrap();
+    assert_eq!(yaml, json);
+    fl().args(["validate", "--format", "yaml"])
+        .arg(&fixture)
+        .assert()
+        .success();
+    fl().args(["validate", "--format", "yaml"])
+        .arg(invalid("e005_self_reference.yml"))
+        .assert()
+        .code(1);
+}
+
+#[test]
+fn text_links_each_code_once() {
+    let out = stdout(fl().args(["validate"]).arg(demo()));
+    let see: Vec<&str> = out.lines().filter(|l| l.starts_with("see ")).collect();
+    assert_eq!(
+        see,
+        [format!("see {DOCS}/E001.md"), format!("see {DOCS}/W002.md")]
+    );
+    // The summary stays the last line; a clean run prints no links.
+    assert!(out.lines().last().unwrap().contains("6 errors, 1 warning"));
+    let clean = stdout(
+        fl().args(["validate"])
+            .arg(common::fixtures().join("valid/e001_known_keys.yml")),
+    );
+    assert!(!clean.contains("see "), "{clean}");
+}
+
+#[test]
+fn github_annotations_link_the_rule_page() {
+    let out = stdout(
+        fl().args(["-q", "validate", "--format", "github"])
+            .arg(invalid("e001_unknown_key.yml")),
+    );
+    let first = out.lines().next().unwrap();
+    // Properties escape `:` and `,`; the message keeps them readable.
+    assert!(first.starts_with("::error file="), "{first}");
+    assert!(
+        first.contains(
+            "e001_unknown_key.yml,title=E001 system[bad_keys_system].privacy_declarations[0].data_categories[0]::"
+        ),
+        "{first}"
+    );
+    assert!(
+        first.ends_with(&format!(
+            "(did you mean `user.contact.email`, `user.contact.url`, `user.contact.fax_number`?) — see {DOCS}/E001.md"
+        )),
+        "{first}"
+    );
+    assert_eq!(out.lines().count(), 3);
+}
+
+/// Structural check of `--format sarif` against the parts of the SARIF 2.1.0 schema that consumers
+/// such as GitHub code scanning rely on. (The output was also checked against the official JSON
+/// schema with ajv; see the PR.)
+#[test]
+fn sarif_output_is_a_valid_sarif_log() {
+    use fideslang_cli::validate::codes::CODES;
+    let out = fl()
+        .args(["-q", "validate", "--format", "sarif"])
+        .arg(demo())
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(1));
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["version"], "2.1.0");
+    assert_eq!(
+        v["$schema"],
+        "https://json.schemastore.org/sarif-2.1.0.json"
+    );
+    let runs = v["runs"].as_array().unwrap();
+    assert_eq!(runs.len(), 1);
+    let driver = &runs[0]["tool"]["driver"];
+    assert_eq!(driver["name"], "fl");
+    assert_eq!(driver["version"], env!("CARGO_PKG_VERSION"));
+    assert_eq!(
+        driver["informationUri"],
+        "https://github.com/noru-tech/fideslang-tools"
+    );
+    let rules = driver["rules"].as_array().unwrap();
+    assert_eq!(rules.len(), CODES.len());
+    for (rule, code) in rules.iter().zip(CODES) {
+        assert_eq!(rule["id"], code.code);
+        assert_eq!(rule["helpUri"], format!("{DOCS}/{}.md", code.code));
+        assert_eq!(rule["shortDescription"]["text"], code.title);
+        assert_eq!(
+            rule["defaultConfiguration"]["level"],
+            code.severity.to_string()
+        );
+    }
+    let results = runs[0]["results"].as_array().unwrap();
+    assert_eq!(results.len(), 7);
+    for r in results {
+        let id = r["ruleId"].as_str().unwrap();
+        let idx = r["ruleIndex"].as_u64().unwrap() as usize;
+        assert_eq!(rules[idx]["id"], id);
+        assert!(matches!(r["level"].as_str().unwrap(), "error" | "warning"));
+        assert!(!r["message"]["text"].as_str().unwrap().is_empty());
+        let loc = &r["locations"][0];
+        let uri = loc["physicalLocation"]["artifactLocation"]["uri"]
+            .as_str()
+            .unwrap();
+        assert!(!uri.contains(' ') && !uri.contains('\\'), "{uri}");
+        assert!(
+            loc["physicalLocation"]["region"]["startLine"]
+                .as_u64()
+                .unwrap()
+                >= 1,
+            "{r}"
+        );
+        assert!(
+            loc["logicalLocations"][0]["fullyQualifiedName"]
+                .as_str()
+                .unwrap()
+                .contains('[')
+        );
+        // No property outside what SARIF defines for a result.
+        for k in r.as_object().unwrap().keys() {
+            assert!(
+                ["ruleId", "ruleIndex", "level", "message", "locations"].contains(&k.as_str()),
+                "{k}"
+            );
+        }
+    }
+    // The line points at the resource's fides_key.
+    let w002 = results.iter().find(|r| r["ruleId"] == "W002").unwrap();
+    let uri = w002["locations"][0]["physicalLocation"]["artifactLocation"]["uri"]
+        .as_str()
+        .unwrap();
+    assert!(uri.ends_with("demo_resources/demo_dataset.yml"), "{uri}");
+    let line = w002["locations"][0]["physicalLocation"]["region"]["startLine"]
+        .as_u64()
+        .unwrap() as usize;
+    let text = std::fs::read_to_string(demo().join("demo_dataset.yml")).unwrap();
+    assert!(
+        text.lines()
+            .nth(line - 1)
+            .unwrap()
+            .contains("fides_key: demo_users_dataset"),
+        "line {line}"
+    );
+    // A resource whose fides_key line cannot be found (no fides_key) falls back to line 1.
+    let dir = tempfile::tempdir().unwrap();
+    let nokey = dir.path().join("nokey.yml");
+    std::fs::write(
+        &nokey,
+        "# comment\nsystem:\n- name: no key\n  system_type: Service\n",
+    )
+    .unwrap();
+    let out = stdout(
+        fl().args(["-q", "validate", "--format", "sarif"])
+            .arg(&nokey),
+    );
+    let v: serde_json::Value = serde_json::from_str(&out).unwrap();
+    let r = &v["runs"][0]["results"][0];
+    assert_eq!(r["ruleId"], "E007");
+    assert_eq!(
+        r["locations"][0]["physicalLocation"]["region"]["startLine"],
+        1
+    );
+    assert!(
+        r["locations"][0]["physicalLocation"]["artifactLocation"]["uri"]
+            .as_str()
+            .unwrap()
+            .ends_with("/nokey.yml")
+    );
+    // Promoted warnings are reported at their effective level; stdin points at `stdin`, line 1.
+    let out = fl()
+        .args(["-q", "validate", "--format", "sarif", "-W", "-"])
+        .write_stdin(std::fs::read(invalid("w004_data_purposes.yml")).unwrap())
+        .output()
+        .unwrap();
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    let r = &v["runs"][0]["results"][0];
+    assert_eq!(r["level"], "error");
+    let physical = &r["locations"][0]["physicalLocation"];
+    assert_eq!(physical["artifactLocation"]["uri"], "stdin");
+    assert_eq!(physical["region"]["startLine"], 1);
+    assert!(
+        r["locations"][0]["logicalLocations"][0]["fullyQualifiedName"]
+            .as_str()
+            .unwrap()
+            .starts_with("dataset[legacy_purposes]")
+    );
+    assert_eq!(out.status.code(), Some(1));
+}

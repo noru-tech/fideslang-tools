@@ -86,6 +86,11 @@ pub const CODES: &[Code] = &[
     ),
 ];
 
+/// The documentation page for a code: `<DOCS_BASE>/docs/rules/<CODE>.md`.
+pub fn help_uri(code: &str) -> String {
+    format!("{}/docs/rules/{code}.md", crate::DOCS_BASE)
+}
+
 /// Look up a code, case-insensitively.
 pub fn lookup(code: &str) -> Option<&'static Code> {
     CODES.iter().find(|c| c.code.eq_ignore_ascii_case(code))
@@ -142,6 +147,15 @@ mod tests {
         assert!(err.contains("unknown validation code `W999`"), "{err}");
         assert!(err.contains("E001, E002"), "{err}");
         assert!(err.contains("W005"), "{err}");
+    }
+
+    #[test]
+    fn help_uri_points_into_this_repository() {
+        assert!(crate::DOCS_BASE.starts_with(env!("CARGO_PKG_REPOSITORY")));
+        assert_eq!(
+            help_uri("E001"),
+            "https://github.com/noru-tech/fideslang-tools/blob/main/docs/rules/E001.md"
+        );
     }
 
     #[test]

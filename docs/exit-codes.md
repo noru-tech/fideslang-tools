@@ -41,7 +41,8 @@ fl validate .fides/ || [ $? -eq 1 ] # report findings without failing, but still
 ```
 
 On GitHub Actions, `fl validate --format github .fides/` prints the findings as annotations on the
-pull request diff and exits the same way.
+pull request diff and exits the same way; `--format sarif` writes a SARIF log for code scanning,
+also with the same exit codes.
 
 ## Error messages
 

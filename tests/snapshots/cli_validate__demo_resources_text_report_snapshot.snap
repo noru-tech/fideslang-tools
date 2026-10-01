@@ -16,4 +16,6 @@ expression: out
   E001 unknown data category `user.cookie_id` — did you mean `user.device.cookie_id`, `user.device.cookie`, `user.unique_id`?
 <demo>/demo_system.yml  system[demo_marketing_system].privacy_declarations[0].data_use
   E001 unknown data use `advertising` — did you mean `marketing.advertising`?
+see https://github.com/noru-tech/fideslang-tools/blob/main/docs/rules/E001.md
+see https://github.com/noru-tech/fideslang-tools/blob/main/docs/rules/W002.md
 5 files, 7 resources checked against iab 3.0.0: 6 errors, 1 warning

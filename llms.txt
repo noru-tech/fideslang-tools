@@ -12,7 +12,7 @@ Install:
 
 Common commands: `fl taxonomy show user.contact.email`, `fl taxonomy search cookie`, `fl taxonomy tree categories --depth 2`, `fl validate .fides/`, `fl graph .fides/ --format mermaid`, `fl convert datamap.yml --to json`, `fl merge .fides/ -o all.yml`, `fl stats .fides/`. Manifest commands default to `./.fides/` when no path is given.
 
-`fl validate` reports findings with stable codes (E001-E007 errors, W001-W005 warnings) and exits 0 (clean or warnings only), 1 (at least one error) or 2 (usage, input or I/O error). `--format json` and `--format github` give machine-readable output.
+`fl validate` reports findings with stable codes (E001-E007 errors, W001-W005 warnings) and exits 0 (clean or warnings only), 1 (at least one error) or 2 (usage, input or I/O error). `--format json` (with `schema_version` and a `help_uri` per finding), `yaml`, `github` (Actions annotations) and `sarif` (SARIF 2.1.0 for code scanning) give machine-readable output.
 
 ## Docs
 

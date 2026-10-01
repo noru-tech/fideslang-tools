@@ -27,12 +27,22 @@ Each finding names the file, the resource and the path inside it, then the code 
 $ fl validate tests/fixtures/invalid/w004_data_purposes.yml
 tests/fixtures/invalid/w004_data_purposes.yml  dataset[legacy_purposes].data_purposes[0]
   W004 `data_purposes` is deprecated; use `data_uses`
+see https://github.com/noru-tech/fideslang-tools/blob/main/docs/rules/W004.md
 1 files, 1 resources checked against iab 3.0.0: 0 errors, 1 warning
 ```
 
-`--format json` prints the same findings as objects with `code`, `severity`, `file`, `resource`,
-`path`, `message` and, when there is one, `suggestion`. `--format github` prints GitHub Actions
-annotations whose title starts with the code.
+The text report ends with one `see <url>` line per code it found, linking to that code's page here.
+
+`--format json` (or `yaml`) prints a document with `schema_version: 1` and the same findings as
+objects with `code`, `severity`, `file`, `resource`, `path`, `message`, `suggestion` (when there is
+one) and `help_uri` (the code's page). `--format github` prints GitHub Actions annotations whose
+title starts with the code and whose message ends with the page's URL. `--format sarif` prints a
+SARIF 2.1.0 log for GitHub code scanning and other SARIF tools: every code is a rule with its
+`helpUri`, and every finding a result with its level, message, file and line: the line of the
+resource's `fides_key` when `fl` can find it, else line 1 (`stdin` for input read from stdin).
+
+The page links are built from one constant, `DOCS_BASE` in `src/lib.rs`
+(`https://github.com/noru-tech/fideslang-tools/blob/main`).
 
 ## Errors, warnings and the exit code
 

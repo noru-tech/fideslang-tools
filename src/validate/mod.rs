@@ -5,6 +5,7 @@
 
 pub mod codes;
 pub mod rules;
+pub mod sarif;
 pub mod suggest;
 
 use std::collections::BTreeSet;
@@ -79,7 +80,35 @@ pub struct Report {
     pub diagnostics: Vec<Diagnostic>,
 }
 
+/// Version of the `fl validate --format json|yaml` document. Bumped only for a change that is not
+/// additive (a field removed, renamed or changing meaning).
+pub const JSON_SCHEMA_VERSION: u32 = 1;
+
 impl Report {
+    /// The `--format json|yaml` document: `schema_version` first, then the report's fields, with a
+    /// `help_uri` added to each finding.
+    pub fn to_json_value(&self) -> serde_json::Value {
+        use serde_json::{Map, Value};
+        let mut doc = Map::new();
+        doc.insert("schema_version".into(), JSON_SCHEMA_VERSION.into());
+        if let Value::Object(fields) = serde_json::to_value(self).expect("report serializes") {
+            doc.extend(fields);
+        }
+        if let Some(Value::Array(diags)) = doc.get_mut("diagnostics") {
+            for (d, v) in self.diagnostics.iter().zip(diags) {
+                if let Value::Object(obj) = v {
+                    obj.insert("help_uri".into(), codes::help_uri(d.code).into());
+                }
+            }
+        }
+        Value::Object(doc)
+    }
+
+    /// The distinct codes reported, in code order.
+    pub fn codes(&self) -> BTreeSet<&'static str> {
+        self.diagnostics.iter().map(|d| d.code).collect()
+    }
+
     pub fn errors(&self) -> usize {
         self.diagnostics
             .iter()
