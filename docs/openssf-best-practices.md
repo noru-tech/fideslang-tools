@@ -29,7 +29,7 @@ N/A because `fl` implements and calls no cryptography.
 | `sites_https` | MUST | Met | Repository, releases, crates.io and the Homebrew tap are all served over HTTPS by GitHub and crates.io. |
 | `discussion` | MUST | Met | GitHub issues and pull requests: searchable, addressable by URL, open to anyone, no proprietary client needed. [issues](https://github.com/noru-tech/fideslang-tools/issues) |
 | `english` | SHOULD | Met | All documentation is in English; reports are accepted in English. |
-| `maintained` | MUST | Met | Releases 0.1.0 to 0.1.3 between 2026-09-13 and 2026-10-01; Dependabot and CI are active. [releases](https://github.com/noru-tech/fideslang-tools/releases) |
+| `maintained` | MUST | Met | Releases 0.1.0 to 0.2.0 between 2026-09-13 and 2026-10-01; Dependabot and CI are active. [releases](https://github.com/noru-tech/fideslang-tools/releases) |
 
 ## Change control
 
@@ -41,7 +41,7 @@ N/A because `fl` implements and calls no cryptography.
 | `repo_distributed` | SUGGESTED | Met | Git. |
 | `version_unique` | MUST | Met | Each release has a unique version in `Cargo.toml` and a tag. [tags](https://github.com/noru-tech/fideslang-tools/tags) |
 | `version_semver` | SUGGESTED | Met | Semantic Versioning, stated in the changelog header. [CHANGELOG.md](https://github.com/noru-tech/fideslang-tools/blob/main/CHANGELOG.md) |
-| `version_tags` | SUGGESTED | Met | `v0.1.0` … `v0.1.3`; releases are cut by tagging. [tags](https://github.com/noru-tech/fideslang-tools/tags) |
+| `version_tags` | SUGGESTED | Met | `v0.1.0` … `v0.2.0`; releases are cut by tagging. [tags](https://github.com/noru-tech/fideslang-tools/tags) |
 | `release_notes` | MUST | Met | Keep a Changelog file with a human-written section per release. [CHANGELOG.md](https://github.com/noru-tech/fideslang-tools/blob/main/CHANGELOG.md) |
 | `release_notes_vulns` | MUST | N/A | No publicly known vulnerability with a CVE or similar ID has been fixed. The 0.1.1 `fl split` path-traversal fix was found internally, had no ID, and is still listed under `Security` in the changelog. [CHANGELOG.md#011---2026-09-14](https://github.com/noru-tech/fideslang-tools/blob/main/CHANGELOG.md#011---2026-09-14) |
 

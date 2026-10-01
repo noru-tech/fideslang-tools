@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-01
+
 ### Added
 - `fl doctor` (`--format text|json|yaml`, exit 0): version, bundled taxonomy version and counts,
   whether output gets colors and why (flag, `FL_COLOR`, `NO_COLOR` / `CLICOLOR_FORCE` / `CLICOLOR`,
@@ -114,7 +116,8 @@ All notable changes to this project are documented here. The format is based on
 - `fl graph` rendering system/dataset/data-use relationships as Graphviz DOT or Mermaid.
 - Shell completions (`fl completions`) and man pages (`fl manpage`).
 
-[Unreleased]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/noru-tech/fideslang-tools/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/noru-tech/fideslang-tools/compare/v0.1.0...v0.1.1

@@ -1,6 +1,6 @@
 [package]
 name = "fideslang-cli"
-version = "0.1.3"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.89"
 description = "Rust CLI for Fideslang privacy taxonomies and Fides manifests. Browse, validate, merge, convert and graph data maps offline."
