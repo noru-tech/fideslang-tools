@@ -1,0 +1,6 @@
+# Extra steps dist runs before `dist build` in each build-local-artifacts job
+# (dist-workspace.toml: github-build-setup). They generate the shell completions and man pages that
+# dist-workspace.toml `include`s in every archive.
+- name: Generate shell completions and man pages
+  shell: bash
+  run: scripts/release-assets.sh target/release-assets

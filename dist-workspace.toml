@@ -20,6 +20,12 @@ targets = [
 install-path = "CARGO_HOME"
 # Where to host releases
 hosting = "github"
+# Extra files in every archive: NOTICE (attribution for the CC BY 4.0 taxonomy), and shell
+# completions (bash, zsh, fish) and man pages as completions/ and man/.
+# scripts/release-assets.sh generates the latter in a build-setup step (.github/build-setup.yml)
+# before `dist build`; they are not committed.
+include = ["NOTICE", "target/release-assets/completions", "target/release-assets/man"]
+github-build-setup = "../build-setup.yml"
 # Whether to install an updater program
 install-updater = false
 # Homebrew: the formula is attached to every release as fl.rb and pushed to the tap below

@@ -50,6 +50,8 @@ jobs:
           cargo run -q -- taxonomy info
           cargo run -q -- taxonomy diff tests/fixtures/demo_resources
           cargo run -q -- validate tests/fixtures/demo_resources || test $? -eq 1
+      - name: generate the release archive's completions and man pages
+        run: scripts/release-assets.sh target/release-assets
 
   msrv:
     name: msrv
