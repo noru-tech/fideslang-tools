@@ -1,9 +1,7 @@
 use std::process::ExitCode;
 
-use clap::Parser;
-
 fn main() -> ExitCode {
-    let cli = fideslang_cli::cli::Cli::parse();
+    let cli = fideslang_cli::cli::parse();
     let command = cli.command.name();
     match fideslang_cli::cli::run(cli) {
         Ok(exit) => exit.into(),

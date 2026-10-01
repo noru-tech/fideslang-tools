@@ -78,6 +78,14 @@ completions to your shell's completion directory and the pages to a `man1` direc
 downloaded with a browser on macOS is quarantined by Gatekeeper; `xattr -d com.apple.quarantine fl`
 clears it.
 
+### How do I update fl?
+
+With the tool you installed it with: `brew upgrade fl`, `cargo binstall fideslang-cli` (or
+`cargo install --locked fideslang-cli`), or a new archive from
+[GitHub Releases](https://github.com/noru-tech/fideslang-tools/releases/latest). `fl` never contacts
+the network, so it never checks for updates or tells you about one; watch the repository's releases
+if you want to hear about them. `fl --version` (or `fl doctor`) shows what you have.
+
 ### How do I verify a release before running it?
 
 Run `gh attestation verify` on the archive, or check its SHA-256 file. Every archive is built by
@@ -240,7 +248,7 @@ they predate Fideslang 3.0 and deliberately fail validation, which makes them a 
 | Check a data map | `fl validate` ([stable E0xx/W0xx codes](docs/rules/README.md), "did you mean" suggestions, GitHub annotations, SARIF) |
 | Transform manifests | `fl cat`, `fl convert` (YAML, JSON, CSV), `fl merge`, `fl split` |
 | Understand a data map | `fl graph` (DOT, Mermaid, JSON), `fl stats`, `fl taxonomy diff` |
-| Shell integration | `fl completions <shell>`, `fl manpage` |
+| Shell integration | `fl completions <shell>`, `fl manpage`, `fl doctor` |
 
 Full command reference:
 
@@ -261,6 +269,7 @@ Full command reference:
 | `fl stats PATH…` | Counts, categorized-field coverage, orphan datasets, key usage (`--rollup`, `--top`) |
 | `fl graph PATH…` | Systems ↔ datasets ↔ flows ↔ uses/categories/subjects as DOT, Mermaid or JSON (`--include`, `--focus KEY --depth N`) |
 | `fl completions <shell>` / `fl manpage` | Shell completions and man pages |
+| `fl doctor` | Version, bundled taxonomy, color decision and why, `./.fides/` contents, whether completions and the man page are installed |
 
 ## What it is not, and known limitations
 
@@ -339,6 +348,7 @@ refresh a taxonomy snapshot.
 | `fl validate` | `text`, `json`, `yaml`, `github` (`::error file=…::` annotations for GitHub Actions), `sarif` (SARIF 2.1.0 for GitHub code scanning) |
 | `fl stats` | `text`, `json`, `yaml` |
 | `fl graph` | `dot`, `mermaid`, `json` |
+| `fl doctor` | `text`, `json`, `yaml` |
 
 `fl validate --format json` (and `yaml`) prints `schema_version` (currently `1`; it changes only
 when a field is removed, renamed or changes meaning), `taxonomy`, `files`, `resources` and
@@ -384,7 +394,9 @@ you rely on its vocabulary.
 
 ## Trust
 
-- **Offline.** `fl` makes no network calls and collects no telemetry. It reads the files you name
+- **Offline.** `fl` makes no network calls and collects no telemetry, and it never checks for
+  updates: you update it with `brew upgrade fl`, `cargo binstall fideslang-cli` or a download from
+  GitHub Releases (see [How do I update fl?](#how-do-i-update-fl)). It reads the files you name
   and writes only where you tell it to (`-o`, `--out-dir`). Treat manifests and anything derived
   from them as sensitive: a data map describes where personal data lives.
 - **Verifiable releases.** Release archives are built by GitHub Actions with
