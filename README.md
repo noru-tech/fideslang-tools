@@ -33,9 +33,11 @@ Python and no network. It bundles the **IAB Tech Lab fideslang 3.0.0** taxonomy 
 
 <!-- Demo: render docs/demo.tape with VHS (https://github.com/charmbracelet/vhs) when a recording is wanted. -->
 
-## Install
+## How do I install fl?
 
-Prebuilt binaries for macOS (Apple Silicon, Intel) and Linux (x86_64, aarch64, fully static).
+Run `brew install noru-tech/tap/fl`, or `cargo binstall fideslang-cli` if you have Rust tooling;
+prebuilt binaries for macOS (Apple Silicon, Intel) and Linux (x86_64, aarch64, fully static) are on
+every release.
 
 ### Homebrew (macOS and Linux)
 
@@ -69,11 +71,11 @@ Each archive unpacks to `fideslang-cli-<target>/fl`; put `fl` anywhere on your `
 downloaded with a browser on macOS is quarantined by Gatekeeper; `xattr -d com.apple.quarantine fl`
 clears it.
 
-### Verify before you run
+### How do I verify a release before running it?
 
-Every archive is built by GitHub Actions from a tagged commit and carries a GitHub artifact
-attestation (SLSA build provenance). Check that the archive was built by this repository's release
-workflow:
+Run `gh attestation verify` on the archive, or check its SHA-256 file. Every archive is built by
+GitHub Actions from a tagged commit and carries a GitHub artifact attestation (SLSA build
+provenance). Check that the archive was built by this repository's release workflow:
 
 ```bash
 gh attestation verify fideslang-cli-aarch64-apple-darwin.tar.xz \
@@ -100,7 +102,10 @@ Shell completions and man pages: `fl completions zsh|bash|fish|…` and `fl manp
 Nothing to configure: the taxonomy is compiled in, and every command below works in an empty
 directory without network access.
 
-### Browse the taxonomy
+### How do I look up a Fideslang data category, data use or data subject?
+
+Use `fl taxonomy show KEY` for one key, `fl taxonomy search WORD` to find keys, and
+`fl taxonomy tree` to see the hierarchy; all three work offline against the bundled taxonomy.
 
 ```console
 $ fl taxonomy tree categories --depth 2
@@ -131,9 +136,11 @@ cat   user.device.cookie_id  Cookie ID
 `--root user.contact`), `fl taxonomy list` prints tables/plain keys/JSON/YAML/CSV, and
 `fl taxonomy cat uses --format csv` reproduces upstream's CSV export.
 
-### Validate and graph a data map
+### How do I validate a Fides manifest offline?
 
-Write a two-resource manifest (one dataset, one system) and check it:
+Run `fl validate PATH`: it checks every manifest file against the bundled taxonomy and the manifest
+structure, with no network and no Fides server, and exits `1` if it finds an error. Write a
+two-resource manifest (one dataset, one system) and check it:
 
 ```console
 $ cat > datamap.yml <<'EOF'
@@ -164,7 +171,17 @@ datamap.yml  dataset[users_db].collections[0].fields[1].data_categories[0]
 1 files, 2 resources checked against iab 3.0.0: 1 error, 0 warnings
 $ echo $?
 1
+```
 
+Every code (`E001` above) has a page that explains it and how to fix it; see
+[Validation rules](#validation-rules).
+
+### How do I draw a data map from Fides manifests?
+
+Run `fl graph PATH`: it renders systems, datasets, data flows and data uses as Graphviz DOT
+(default), Mermaid or JSON.
+
+```console
 $ fl graph datamap.yml --format mermaid
 flowchart LR
   …
@@ -325,11 +342,11 @@ Exit codes (details in [docs/exit-codes.md](docs/exit-codes.md)):
 | `1` | Findings: `fl validate` reported at least one error (warnings count once promoted by `-W` or `--deny`), or `fl taxonomy diff --exit-code` found a difference |
 | `2` | Error: invalid command line, unreadable or unparsable input, I/O failure, or `fl merge --fail-on-duplicate` found a duplicate `fides_key` |
 
-## How to cite
+## How do I cite fl?
 
-If you use `fl` in research or documentation, cite it with the metadata in
-[`CITATION.cff`](./CITATION.cff) (GitHub's "Cite this repository" button renders it as APA or
-BibTeX). Please also cite the IAB Tech Lab Privacy Taxonomy itself when you rely on its vocabulary.
+Cite it with the metadata in [`CITATION.cff`](./CITATION.cff); GitHub's "Cite this repository"
+button renders it as APA or BibTeX. Please also cite the IAB Tech Lab Privacy Taxonomy itself when
+you rely on its vocabulary.
 
 ## Trust
 
@@ -338,8 +355,9 @@ BibTeX). Please also cite the IAB Tech Lab Privacy Taxonomy itself when you rely
   from them as sensitive: a data map describes where personal data lives.
 - **Verifiable releases.** Release archives are built by GitHub Actions with
   [dist](https://opensource.axo.dev/cargo-dist/), carry SHA-256 checksums and GitHub artifact
-  attestations (see [Verify before you run](#verify-before-you-run)), and releases after 0.1.1
-  include a CycloneDX SBOM (`fideslang-cli.cdx.xml`).
+  attestations (see
+  [How do I verify a release before running it?](#how-do-i-verify-a-release-before-running-it)),
+  and releases after 0.1.1 include a CycloneDX SBOM (`fideslang-cli.cdx.xml`).
 - **Supply chain.** CI actions are pinned to commit hashes, dependencies are checked with
   `cargo-deny`, and the repository is scored by
   [OpenSSF Scorecard](https://scorecard.dev/viewer/?uri=github.com/noru-tech/fideslang-tools).
