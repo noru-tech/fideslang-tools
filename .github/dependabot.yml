@@ -4,3 +4,22 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # One weekly PR for every action. Separate PRs left github/codeql-action/init, /analyze and
+    # /upload-sarif on different versions (CodeQL fails when they differ), and the default limit
+    # of 5 open PRs held back the rest.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    # Minor and patch updates share one weekly PR; a major update gets its own, since it may need
+    # code changes. Edition 2024's resolver keeps Cargo.lock within rust-version (the msrv job checks).
+    groups:
+      cargo:
+        update-types:
+          - minor
+          - patch

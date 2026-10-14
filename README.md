@@ -359,7 +359,7 @@ as a rule with its `helpUri`; each result carries the file and a line: the line 
 
 ```yaml
 - run: fl validate --format sarif .fides/ -o fl.sarif || [ $? -eq 1 ]
-- uses: github/codeql-action/upload-sarif@v3   # pin to a commit hash
+- uses: github/codeql-action/upload-sarif@v4   # pin to a commit hash
   with:
     sarif_file: fl.sarif
 ```

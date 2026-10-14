@@ -93,7 +93,7 @@ N/A because `fl` implements and calls no cryptography.
 | `crypto_random` | MUST | N/A | `fl` generates no keys or nonces. |
 | `delivery_mitm` | MUST | Met | Releases, crates.io and the Homebrew tap are delivered over HTTPS; archives carry GitHub artifact attestations. [README #how-do-i-verify-a-release-before-running-it](https://github.com/noru-tech/fideslang-tools#how-do-i-verify-a-release-before-running-it) |
 | `delivery_unsigned` | MUST | Met | Checksums are fetched over HTTPS from GitHub Releases, and the attestation (a signed statement) can be checked with `gh attestation verify`. |
-| `vulnerabilities_fixed_60_days` | MUST | Met | No known unpatched vulnerabilities; `cargo-deny` checks RustSec advisories in CI. |
+| `vulnerabilities_fixed_60_days` | MUST | Met | No known unpatched vulnerabilities; `cargo-deny` checks RustSec advisories in CI, and Dependabot proposes Cargo and GitHub Actions updates weekly. |
 | `vulnerabilities_critical_fixed` | SHOULD | Met | The one security fix so far (0.1.1) shipped one day after 0.1.0. |
 | `no_leaked_credentials` | MUST | Met | No credentials in the repository; crates.io publishing uses Trusted Publishing (OIDC), and the only secret (`HOMEBREW_TAP_TOKEN`) lives in GitHub repository secrets. |
 
@@ -114,8 +114,5 @@ N/A because `fl` implements and calls no cryptography.
 
 - `dynamic_analysis` (SUGGESTED): add a fuzz target for manifest parsing (`cargo fuzz`) and run it in
   a scheduled workflow.
-- Dependabot covers GitHub Actions only; Cargo dependencies are refreshed by hand. Adding a `cargo`
-  ecosystem entry to `.github/dependabot.yml` would make `vulnerabilities_fixed_60_days` less
-  dependent on manual checks.
 - Before submitting, confirm `report_responses` and `enhancement_responses` against the live issue
   tracker.
