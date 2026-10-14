@@ -11,3 +11,15 @@ updates:
       github-actions:
         patterns:
           - "*"
+
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    # Minor and patch updates share one weekly PR; a major update gets its own, since it may need
+    # code changes. Edition 2024's resolver keeps Cargo.lock within rust-version (the msrv job checks).
+    groups:
+      cargo:
+        update-types:
+          - minor
+          - patch
