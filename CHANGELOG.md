@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+- CI actions bumped: `github/codeql-action` 4.38.3 (`init`, `analyze` and `upload-sarif` together),
+  `actions/upload-artifact` 7.0.2, `actions/download-artifact` 8.0.2, `crate-ci/typos` 1.51.1,
+  `ossf/scorecard-action` 2.5.0 and `dtolnay/rust-toolchain` (master, 2026-10). Dependabot now
+  groups every action update into one weekly PR.
+- README: the SARIF upload example uses `github/codeql-action/upload-sarif@v4`.
+
 ## [0.2.0] - 2026-10-01
 
 ### Added

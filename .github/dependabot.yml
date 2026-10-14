@@ -4,3 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # One weekly PR for every action. Separate PRs left github/codeql-action/init, /analyze and
+    # /upload-sarif on different versions (CodeQL fails when they differ), and the default limit
+    # of 5 open PRs held back the rest.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
