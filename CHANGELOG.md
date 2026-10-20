@@ -7,13 +7,16 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 
 ### Changed
-- CI actions bumped: `github/codeql-action` 4.38.3 (`init`, `analyze` and `upload-sarif` together),
+- CI actions bumped: `github/codeql-action` 4.39.0 (`init`, `analyze` and `upload-sarif` together),
   `actions/upload-artifact` 7.0.2, `actions/download-artifact` 8.0.2, `crate-ci/typos` 1.51.1,
   `ossf/scorecard-action` 2.5.0 and `dtolnay/rust-toolchain` (master, 2026-10). Dependabot now
   groups every action update into one weekly PR.
 - Dependabot also watches Cargo dependencies: one weekly PR for minor and patch updates, a separate
   PR for each major update.
 - README: the SARIF upload example uses `github/codeql-action/upload-sarif@v4`.
+- YAML parsing and serialization moved to `serde-saphyr` 2.0, built without its new `comments`
+  feature (`fl` never reads YAML comments; skipping them makes parsing faster). `serde_json` 1.0.154
+  and other lockfile updates.
 
 ## [0.2.0] - 2026-10-01
 
